@@ -88,7 +88,7 @@ if ($method === 'POST') {
         jsonError('All fields are required');
     }
 
-    $stmt = $conn->prepare("INSERT INTO products (user_id, title, category_id, description, price, condition, image, status) 
+    $stmt = $conn->prepare("INSERT INTO products (user_id, title, category_id, description, price, `condition`, image, status)
                             VALUES (?, ?, ?, ?, ?, ?, ?, 'active')");
     $stmt->bind_param("isisdss", $userId, $title, $categoryId, $description, $price, $condition, $image);
 
@@ -129,10 +129,11 @@ if ($method === 'PUT') {
     $price = isset($input['price']) ? floatval($input['price']) : 0;
     $condition = isset($input['condition']) ? sanitize($input['condition']) : '';
     $image = isset($input['image']) ? sanitize($input['image']) : null;
+    $status = isset($input['status']) ? sanitize($input['status']) : 'active';
 
-    $stmt = $conn->prepare("UPDATE products SET title = ?, category_id = ?, description = ?, price = ?, condition = ?, image = ? 
+    $stmt = $conn->prepare("UPDATE products SET title = ?, category_id = ?, description = ?, price = ?, `condition` = ?, image = ?, status = ?
                             WHERE product_id = ? AND user_id = ?");
-    $stmt->bind_param("sisdsiii", $title, $categoryId, $description, $price, $condition, $image, $productId, $userId);
+    $stmt->bind_param("sisdsissi", $title, $categoryId, $description, $price, $condition, $image, $status, $productId, $userId);
 
     if ($stmt->execute()) {
         jsonResponse(['success' => true, 'message' => 'Product updated successfully']);

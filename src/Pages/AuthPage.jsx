@@ -24,7 +24,7 @@ export default function AuthPage({ onLogin, onRegister, initialMode = 'login' })
 
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setLoginError('');
 
@@ -46,10 +46,13 @@ export default function AuthPage({ onLogin, onRegister, initialMode = 'login' })
       return;
     }
 
-    onLogin(email);
+    const result = await onLogin(email, password);
+    if (!result.success) {
+      setLoginError(result.error || 'Login failed');
+    }
   };
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     setRegError('');
 
@@ -83,7 +86,10 @@ export default function AuthPage({ onLogin, onRegister, initialMode = 'login' })
       return;
     }
 
-    onRegister(name, email, password);
+    const result = await onRegister(name, email, password);
+    if (!result.success) {
+      setRegError(result.error || 'Registration failed');
+    }
   };
 
   const switchToLogin = () => {
