@@ -15,6 +15,7 @@ import AddProductPage from './Pages/Addproductpage';
 import EditProductPage from './Pages/editproduct';
 import DashboardPage from './Pages/Dashboard';
 import ProfilePage from './Pages/profile';
+import StartupCheckPage from './Pages/StartupCheck';
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -380,6 +381,9 @@ export default function App() {
             userProductCount={userProducts.length}
           />
         );
+
+      case 'startup-check':
+        return <StartupCheckPage />;
 
       default:
         if (currentPage.startsWith('product-')) {

@@ -2,7 +2,7 @@
 // api/user.php
 // Get current user profile and stats
 
-require_once __DIR__ . '/includes/header.php';
+require_once __DIR__ . '/../includes/header.php';
 
 if (!isLoggedIn()) {
     jsonError('Authentication required', 401);

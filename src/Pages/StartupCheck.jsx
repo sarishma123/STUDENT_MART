@@ -1,21 +1,7 @@
 const API_BASE = "/api";
 
-async function request(endpoint, options = {}) {
-  const response = await fetch(`${API_BASE}/${endpoint}`, options);
-
-  // This catches HTML before trying to parse JSON.
-  const text = await response.text();
-
-  try {
-    return JSON.parse(text);
-  } catch {
-    console.error("Server returned:", text);
-    throw new Error("Server returned HTML instead of JSON.");
-  }
-}
-
 export async function register(userData) {
-  return request("auth.php", {
+  const response = await fetch(`${API_BASE}/auth.php`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -25,10 +11,12 @@ export async function register(userData) {
       ...userData,
     }),
   });
+
+  return response.json();
 }
 
 export async function login(userData) {
-  return request("auth.php", {
+  const response = await fetch(`${API_BASE}/auth.php`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -38,12 +26,17 @@ export async function login(userData) {
       ...userData,
     }),
   });
+
+  return response.json();
 }
 
 export async function healthCheck() {
-  return request("health.php");
+  const response = await fetch(`${API_BASE}/health.php`);
+
+  return response.json();
 }
 
+// 👇 This is what StartupCheck imports.
 export const api = {
   register,
   login,

@@ -2,13 +2,22 @@
 // api/auth.php
 // Handle login and register
 
-require_once __DIR__ . '/includes/header.php';
+require_once __DIR__ . '/../includes/header.php';
 
 $action = $_SERVER['REQUEST_METHOD'];
+$input = json_decode(file_get_contents('php://input'), true);
+if (!is_array($input)) {
+    $input = [];
+}
 
 if ($action === 'POST') {
-    $input = json_decode(file_get_contents('php://input'), true);
-    $type = isset($input['type']) ? sanitize($input['type']) : '';
+    if (isLoggedIn() && !empty($input['logout'])) {
+        $_SESSION = [];
+        session_destroy();
+        jsonResponse(['success' => true, 'message' => 'Logged out']);
+    }
+
+    $type = isset($input['type']) ? sanitize($input['type']) : (isset($_GET['type']) ? sanitize($_GET['type']) : '');
 
     if ($type === 'login') {
         $email = isset($input['email']) ? sanitize($input['email']) : '';
@@ -103,9 +112,8 @@ if ($action === 'GET' && isLoggedIn()) {
     ]);
 }
 
-if ($action === 'POST' && isLoggedIn() && isset($_POST['logout'])) {
-    session_destroy();
-    jsonResponse(['success' => true, 'message' => 'Logged out']);
+if ($action === 'GET') {
+    jsonError('No active session', 401);
 }
 
 jsonError('Method not allowed', 405);
