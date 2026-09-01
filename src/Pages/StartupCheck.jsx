@@ -1,13 +1,15 @@
-const API_BASE = "/api";
+import { useEffect, useState } from 'react';
+
+const API_BASE = '/api';
 
 export async function register(userData) {
   const response = await fetch(`${API_BASE}/auth.php`, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      type: "register",
+      type: 'register',
       ...userData,
     }),
   });
@@ -17,12 +19,12 @@ export async function register(userData) {
 
 export async function login(userData) {
   const response = await fetch(`${API_BASE}/auth.php`, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      type: "login",
+      type: 'login',
       ...userData,
     }),
   });
@@ -32,13 +34,32 @@ export async function login(userData) {
 
 export async function healthCheck() {
   const response = await fetch(`${API_BASE}/health.php`);
-
   return response.json();
 }
 
-// 👇 This is what StartupCheck imports.
 export const api = {
   register,
   login,
   healthCheck,
 };
+
+export default function StartupCheckPage() {
+  const [status, setStatus] = useState('Checking API...');
+
+  useEffect(() => {
+    healthCheck()
+      .then((data) => {
+        setStatus(data?.success ? 'API connected' : 'API check failed');
+      })
+      .catch(() => {
+        setStatus('API unavailable');
+      });
+  }, []);
+
+  return (
+    <div className="page">
+      <h1>Startup Check</h1>
+      <p>{status}</p>
+    </div>
+  );
+}

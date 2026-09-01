@@ -1,5 +1,5 @@
 import { Search } from 'lucide-react';
-import ProductCard from "../components/ProductCard";;
+import ProductCard from '../component/productcard';
 
 export default function BrowsePage({
   products,
