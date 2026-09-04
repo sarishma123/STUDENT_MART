@@ -5,6 +5,7 @@ A React-based student marketplace app that lets students browse, search, and fav
 ## 🎯 About
 
 StudentMart is a fourth-semester BCA project built to give students a simple platform to buy and sell items within their college community.
+within the collage phriphery
 
 ## ✅ Current Features
 
@@ -25,6 +26,7 @@ StudentMart is a fourth-semester BCA project built to give students a simple pla
 
 - React
 - JavaScript (JSX)
+- PHP
 
 ## 🚀 Getting Started
 
