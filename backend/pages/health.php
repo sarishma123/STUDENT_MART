@@ -3,6 +3,9 @@
 // Basic health check for PHP runtime, DB connectivity, and session state.
 
 require_once __DIR__ . '/../includes/header.php';
+require_once __DIR__ . "/../config/db.php";
+
+header("Content-Type: application/json");
 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     jsonError('Method not allowed', 405);
