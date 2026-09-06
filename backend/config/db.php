@@ -4,7 +4,7 @@
 $host = "localhost";
 $username = "root";
 $password = "";
-$database = "student_mart";
+$database = "on_campus_mart";
 
 // Create connection
 $conn = new mysqli($host, $username, $password, $database);
@@ -17,8 +17,4 @@ if ($conn->connect_error) {
 
 // Character encoding
 $conn->set_charset("utf8mb4");
-?>
-
-<?php
-require_once __DIR__ . "/../config/db.php";
 ?>

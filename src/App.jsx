@@ -4,7 +4,7 @@ import './App.css';
 import Header from './component/header';
 import Footer from './component/footer';
 
-import { categories } from './Data/product';
+import { categories, initialProducts } from './Data/product';
 import { api } from './api';
 
 import AuthPage from './Pages/AuthPage';
@@ -33,8 +33,6 @@ export default function App() {
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const generateId = () => Date.now() + Math.random();
-
   const mapApiProduct = (p) => ({
     id: Number(p.product_id),
     title: p.title || 'Untitled',
@@ -59,7 +57,6 @@ export default function App() {
       setFilteredProducts(mapped);
     } catch (error) {
       console.warn('Backend not available, using demo data:', error.message);
-      const { initialProducts } = await import('./Data/product');
       const mapped = initialProducts.map((p, index) => ({ ...p, id: Number(p.id || index + 1) }));
       setProducts(mapped);
       setFilteredProducts(mapped);

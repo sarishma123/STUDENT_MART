@@ -1,16 +1,7 @@
 const API_BASE = "/api";
 
-  const data = await response.json();
-
-  if (!response.ok && response.status !== 401) {
-    throw new Error(data.message || "Request failed");
-  }
-
-  return data;
-
-
 async function request(endpoint, options = {}) {
-  const response = await fetch(`http://localhost/STUDENT_MART/backend/pages/${endpoint}`, {
+  const response = await fetch(`${API_BASE}/${endpoint}`, {
     credentials: "include", // IMPORTANT: send PHP session cookie
     headers: {
       "Content-Type": "application/json",
