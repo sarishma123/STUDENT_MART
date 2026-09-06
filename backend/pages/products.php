@@ -2,7 +2,7 @@
 // api/products.php
 // CRUD operations for products
 
-require_once __DIR__ . '/includes/header.php';
+require_once __DIR__ . '/../includes/header.php';
 
 $method = $_SERVER['REQUEST_METHOD'];
 

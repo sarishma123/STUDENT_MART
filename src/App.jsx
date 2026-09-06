@@ -4,7 +4,7 @@ import './App.css';
 import Header from './component/header';
 import Footer from './component/footer';
 
-import { categories } from './Data/product';
+import { categories, initialProducts } from './Data/product';
 import { api } from './api';
 
 import AuthPage from './Pages/AuthPage';
@@ -15,6 +15,7 @@ import AddProductPage from './Pages/Addproductpage';
 import EditProductPage from './Pages/editproduct';
 import DashboardPage from './Pages/Dashboard';
 import ProfilePage from './Pages/profile';
+import StartupCheckPage from './Pages/StartupCheck';
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -31,8 +32,6 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const generateId = () => Date.now() + Math.random();
 
   const mapApiProduct = (p) => ({
     id: Number(p.product_id),
@@ -58,7 +57,6 @@ export default function App() {
       setFilteredProducts(mapped);
     } catch (error) {
       console.warn('Backend not available, using demo data:', error.message);
-      const { initialProducts } = await import('./Data/product');
       const mapped = initialProducts.map((p, index) => ({ ...p, id: Number(p.id || index + 1) }));
       setProducts(mapped);
       setFilteredProducts(mapped);
@@ -91,21 +89,31 @@ export default function App() {
   }, [isLoggedIn, currentUser]);
 
   const checkAuth = async () => {
-    try {
-      const data = await api.getCurrentUser();
-      if (data.user) {
-        setCurrentUser({
-          id: data.user.id,
-          email: data.user.email,
-          name: data.user.name,
-          profileImage: '👤',
-          joinDate: 'Member',
-        });
-        setIsLoggedIn(true);
-      }
-    } catch (error) {
-      console.warn('No active session');
-    }
+ try {
+  const data = await api.getCurrentUser();
+
+  // Check that data exists before reading data.user
+  if (data && data.user) {
+    setCurrentUser({
+      id: data.user.id,
+      email: data.user.email,
+      name: data.user.name,
+      profileImage: "👤",
+      joinDate: "Member",
+    });
+
+    setIsLoggedIn(true);
+  } else {
+    setCurrentUser(null);
+    setIsLoggedIn(false);
+    console.warn("No active user session.");
+  }
+
+} catch (error) {
+  setCurrentUser(null);
+  setIsLoggedIn(false);
+  console.warn("No active session:", error);
+}
   };
 
   useEffect(() => {
@@ -380,6 +388,9 @@ export default function App() {
             userProductCount={userProducts.length}
           />
         );
+
+      case 'startup-check':
+        return <StartupCheckPage />;
 
       default:
         if (currentPage.startsWith('product-')) {

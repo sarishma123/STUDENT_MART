@@ -22,6 +22,9 @@ export default function Header({
         <button onClick={() => setCurrentPage('browse')} className="site-nav__link">
           Browse
         </button>
+        <button onClick={() => setCurrentPage('startup-check')} className="site-nav__link">
+          System Check
+        </button>
         <button onClick={onBuySellClick} className="site-nav__link">
           Buy/Sell
         </button>

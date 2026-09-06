@@ -2,7 +2,7 @@
 // api/browse.php
 // Get all active products (optionally filtered)
 
-require_once __DIR__ . '/includes/header.php';
+require_once __DIR__ . '/../includes/header.php';
 
 $search = isset($_GET['search']) ? sanitize($_GET['search']) : '';
 $category = isset($_GET['category']) ? sanitize($_GET['category']) : '';

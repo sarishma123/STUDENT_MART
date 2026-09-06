@@ -1,77 +1,137 @@
-const API_BASE = '/api';
+const API_BASE = "/api";
 
-async function request(path, options = {}) {
-  const url = `${API_BASE}${path}`;
-  const config = {
+async function request(endpoint, options = {}) {
+  const response = await fetch(`${API_BASE}/${endpoint}`, {
+    credentials: "include", // IMPORTANT: send PHP session cookie
     headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
+      "Content-Type": "application/json",
+      ...(options.headers || {})
     },
-    credentials: 'include',
-    ...options,
-  };
+    ...options
+  });
 
-  if (config.body && typeof config.body === 'object' && !(config.body instanceof FormData)) {
-    config.body = JSON.stringify(config.body);
+  const data = await response.json();
+
+  // If it's a 401 (not logged in), return the JSON instead of crashing.
+  if (response.status === 401) {
+    return data;
   }
-
-  const response = await fetch(url, config);
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ error: response.statusText }));
-    throw new Error(error.error || 'Something went wrong');
+    throw new Error(data.message || "Request failed");
   }
 
-  return response.json();
+  return data;
+}
+
+export async function register(userData) {
+  const payload = typeof userData === "object" && userData !== null
+    ? userData
+    : { name: userData, email: arguments[1], password: arguments[2] };
+
+  return request("auth.php", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      type: "register",
+      ...payload,
+    }),
+  });
+}
+
+export async function login(userData) {
+  const payload = typeof userData === "object" && userData !== null
+    ? userData
+    : { email: userData, password: arguments[1] };
+
+  return request("auth.php", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      type: "login",
+      ...payload,
+    }),
+  });
+}
+
+export async function logout() {
+  return request("auth.php", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ logout: true }),
+  });
+}
+
+export async function getCurrentUser() {
+  try {
+    const data = await request("auth.php");
+
+    console.log("Current user response:", data);
+
+    return data;
+  } catch (error) {
+    console.error("getCurrentUser error:", error);
+    return null;
+  }
+}
+
+export async function getProducts() {
+  return request("products.php");
+}
+
+export async function getUserProducts(userId) {
+  return request(`products.php?user_id=${encodeURIComponent(userId)}`);
+}
+
+export async function createProduct(productData) {
+  return request("products.php", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(productData),
+  });
+}
+
+export async function updateProduct(productData) {
+  return request("products.php", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(productData),
+  });
+}
+
+export async function deleteProduct(productId) {
+  return request("products.php", {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ product_id: productId }),
+  });
+}
+
+export async function healthCheck() {
+  return request("health.php");
 }
 
 export const api = {
-  getProducts: (params = {}) => {
-    const query = new URLSearchParams();
-    Object.entries(params).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        query.append(key, value);
-      }
-    });
-    const qs = query.toString();
-    return request(`/browse.php${qs ? `?${qs}` : ''}`);
-  },
-
-  getProduct: (id) => request(`/products.php?id=${id}`),
-
-  getUserProducts: (userId) => request(`/products.php?user_id=${userId}`),
-
-  createProduct: (data) => request('/products.php', {
-    method: 'POST',
-    body: data,
-  }),
-
-  updateProduct: (data) => request('/products.php', {
-    method: 'PUT',
-    body: data,
-  }),
-
-  deleteProduct: (productId) => request('/products.php', {
-    method: 'DELETE',
-    body: { product_id: productId },
-  }),
-
-  login: (email, password) => request('/auth.php?type=login', {
-    method: 'POST',
-    body: { email, password },
-  }),
-
-  register: (name, email, password) => request('/auth.php?type=register', {
-    method: 'POST',
-    body: { name, email, password },
-  }),
-
-  getCurrentUser: () => request('/auth.php'),
-
-  getUserProfile: () => request('/user.php'),
-
-  logout: () => request('/auth.php', {
-    method: 'POST',
-    body: { logout: true },
-  }),
+  register,
+  login,
+  logout,
+  getCurrentUser,
+  getProducts,
+  getUserProducts,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+  healthCheck,
 };

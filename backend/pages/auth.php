@@ -1,13 +1,24 @@
 <?php
 // api/auth.php
 // Handle login and register
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 
-require_once __DIR__ . "/../includes/header.php";
+require_once __DIR__ . '/../includes/header.php';
 
 $action = $_SERVER['REQUEST_METHOD'];
+$input = json_decode(file_get_contents('php://input'), true);
+if (!is_array($input)) {
+    $input = [];
+}
 
 if ($action === 'POST') {
-    $input = json_decode(file_get_contents('php://input'), true);
+    if (isLoggedIn() && !empty($input['logout'])) {
+        $_SESSION = [];
+        session_destroy();
+        jsonResponse(['success' => true, 'message' => 'Logged out']);
+    }
+
     $type = isset($input['type']) ? sanitize($input['type']) : '';
 
     if ($type === 'login') {
@@ -93,19 +104,23 @@ if ($action === 'POST') {
     }
 }
 
-if ($action === 'GET' && isLoggedIn()) {
+if ($action === 'GET') {
+    if (isLoggedIn()) {
+        jsonResponse([
+            'success' => true,
+            'user' => [
+                'id' => $_SESSION['user_id'],
+                'name' => $_SESSION['user_name'],
+                'email' => $_SESSION['user_email']
+            ]
+        ]);
+    }
+
     jsonResponse([
-        'user' => [
-            'id' => $_SESSION['user_id'],
-            'name' => $_SESSION['user_name'],
-            'email' => $_SESSION['user_email']
-        ]
+        'success' => false,
+        'user' => null,
+        'message' => 'No active session'
     ]);
 }
 
-if ($action === 'POST' && isLoggedIn() && isset($_POST['logout'])) {
-    session_destroy();
-    jsonResponse(['success' => true, 'message' => 'Logged out']);
-}
-
-jsonError('Method not allowed', 405);
+jsonError("Method not allowed", 405);
