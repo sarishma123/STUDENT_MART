@@ -2,7 +2,7 @@
 // api/auth.php
 // Handle login and register
 
-require_once __DIR__ . '/includes/header.php';
+require_once __DIR__ . "/../includes/header.php";
 
 $action = $_SERVER['REQUEST_METHOD'];
 
