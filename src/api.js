@@ -1,12 +1,4 @@
-async function request(endpoint, options = {}) {
-  const response = await fetch(`${API_BASE}/${endpoint}`, {
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      ...(options.headers || {}),
-    },
-    ...options,
-  });
+const API_BASE = "/api";
 
   const data = await response.json();
 
@@ -15,7 +7,7 @@ async function request(endpoint, options = {}) {
   }
 
   return data;
-}
+
 
 async function request(endpoint, options = {}) {
   const response = await fetch(`http://localhost/STUDENT_MART/backend/pages/${endpoint}`, {
