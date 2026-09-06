@@ -1,23 +1,44 @@
-const API_BASE = "/api";
+async function request(endpoint, options = {}) {
+  const response = await fetch(`${API_BASE}/${endpoint}`, {
+    credentials: "include",
+    headers: {
+      "Content-Type": "application/json",
+      ...(options.headers || {}),
+    },
+    ...options,
+  });
+
+  const data = await response.json();
+
+  if (!response.ok && response.status !== 401) {
+    throw new Error(data.message || "Request failed");
+  }
+
+  return data;
+}
 
 async function request(endpoint, options = {}) {
-  const response = await fetch(`${API_BASE}/${endpoint}`, options);
-  const text = await response.text();
+  const response = await fetch(`http://localhost/STUDENT_MART/backend/pages/${endpoint}`, {
+    credentials: "include", // IMPORTANT: send PHP session cookie
+    headers: {
+      "Content-Type": "application/json",
+      ...(options.headers || {})
+    },
+    ...options
+  });
 
-  if (!text) {
-    return null;
-  }
+  const data = await response.json();
 
-  try {
-    const data = JSON.parse(text);
-    if (!response.ok) {
-      throw new Error(data?.error || "Request failed");
-    }
+  // If it's a 401 (not logged in), return the JSON instead of crashing.
+  if (response.status === 401) {
     return data;
-  } catch {
-    console.error("Server returned:", text);
-    throw new Error("Server returned HTML instead of JSON.");
   }
+
+  if (!response.ok) {
+    throw new Error(data.message || "Request failed");
+  }
+
+  return data;
 }
 
 export async function register(userData) {
