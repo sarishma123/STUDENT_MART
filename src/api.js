@@ -65,7 +65,16 @@ export async function logout() {
 }
 
 export async function getCurrentUser() {
-  return request("auth.php");
+  try {
+    const data = await request("auth.php");
+
+    console.log("Current user response:", data);
+
+    return data;
+  } catch (error) {
+    console.error("getCurrentUser error:", error);
+    return null;
+  }
 }
 
 export async function getProducts() {
