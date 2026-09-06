@@ -60,7 +60,17 @@ export default function ProductDetailPage({
             <p className="detail-contact-value">
               {product.contact}
             </p>
-            <button className="btn btn-primary btn-block"> Contact Seller</button>
+            <button
+              onClick={() => {
+                if (product.contact) {
+                  window.location.href = `mailto:${product.contact}`;
+                }
+              }}
+              className="btn btn-primary btn-block"
+              disabled={!product.contact}
+            >
+              Contact Seller
+            </button>
           </div>
 
           {!isLoggedIn && (

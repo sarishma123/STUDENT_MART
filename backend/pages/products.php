@@ -133,7 +133,7 @@ if ($method === 'PUT') {
 
     $stmt = $conn->prepare("UPDATE products SET title = ?, category_id = ?, description = ?, price = ?, `condition` = ?, image = ?, status = ?
                             WHERE product_id = ? AND user_id = ?");
-    $stmt->bind_param("sisdsissi", $title, $categoryId, $description, $price, $condition, $image, $status, $productId, $userId);
+    $stmt->bind_param("sisdsssii", $title, $categoryId, $description, $price, $condition, $image, $status, $productId, $userId);
 
     if ($stmt->execute()) {
         jsonResponse(['success' => true, 'message' => 'Product updated successfully']);
