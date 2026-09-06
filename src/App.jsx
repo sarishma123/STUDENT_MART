@@ -92,21 +92,31 @@ export default function App() {
   }, [isLoggedIn, currentUser]);
 
   const checkAuth = async () => {
-    try {
-      const data = await api.getCurrentUser();
-      if (data.user) {
-        setCurrentUser({
-          id: data.user.id,
-          email: data.user.email,
-          name: data.user.name,
-          profileImage: '👤',
-          joinDate: 'Member',
-        });
-        setIsLoggedIn(true);
-      }
-    } catch (error) {
-      console.warn('No active session');
-    }
+ try {
+  const data = await api.getCurrentUser();
+
+  // Check that data exists before reading data.user
+  if (data && data.user) {
+    setCurrentUser({
+      id: data.user.id,
+      email: data.user.email,
+      name: data.user.name,
+      profileImage: "👤",
+      joinDate: "Member",
+    });
+
+    setIsLoggedIn(true);
+  } else {
+    setCurrentUser(null);
+    setIsLoggedIn(false);
+    console.warn("No active user session.");
+  }
+
+} catch (error) {
+  setCurrentUser(null);
+  setIsLoggedIn(false);
+  console.warn("No active session:", error);
+}
   };
 
   useEffect(() => {
