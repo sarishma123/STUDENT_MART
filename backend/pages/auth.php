@@ -5,7 +5,6 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 require_once __DIR__ . '/../includes/header.php';
-
 $action = $_SERVER['REQUEST_METHOD'];
 $input = json_decode(file_get_contents('php://input'), true);
 if (!is_array($input)) {
@@ -19,7 +18,7 @@ if ($action === 'POST') {
         jsonResponse(['success' => true, 'message' => 'Logged out']);
     }
 
-    $type = isset($input['type']) ? sanitize($input['type']) : '';
+    $type = isset($input['type']) ? sanitize($input['type']) : (isset($_GET['type']) ? sanitize($_GET['type']) : '');
 
     if ($type === 'login') {
         $email = isset($input['email']) ? sanitize($input['email']) : '';
@@ -104,23 +103,18 @@ if ($action === 'POST') {
     }
 }
 
-if ($action === 'GET') {
-    if (isLoggedIn()) {
-        jsonResponse([
-            'success' => true,
-            'user' => [
-                'id' => $_SESSION['user_id'],
-                'name' => $_SESSION['user_name'],
-                'email' => $_SESSION['user_email']
-            ]
-        ]);
-    }
-
+if ($action === 'GET' && isLoggedIn()) {
     jsonResponse([
-        'success' => false,
-        'user' => null,
-        'message' => 'No active session'
+        'user' => [
+            'id' => $_SESSION['user_id'],
+            'name' => $_SESSION['user_name'],
+            'email' => $_SESSION['user_email']
+        ]
     ]);
 }
 
-jsonError("Method not allowed", 405);
+if ($action === 'GET') {
+    jsonError('No active session', 401);
+}
+
+jsonError('Method not allowed', 405);
