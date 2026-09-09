@@ -2,23 +2,26 @@ const API_BASE = "/api";
 
 async function request(endpoint, options = {}) {
   const response = await fetch(`${API_BASE}/${endpoint}`, {
-    credentials: "include", // IMPORTANT: send PHP session cookie
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
-      ...(options.headers || {})
+      ...(options.headers || {}),
     },
-    ...options
+    ...options,
   });
 
-  const data = await response.json();
+  const text = await response.text();
 
-  // If it's a 401 (not logged in), return the JSON instead of crashing.
-  if (response.status === 401) {
-    return data;
+  console.log("API Response:", text);
+
+  if (!text.trim()) {
+    throw new Error("Backend returned an empty response.");
   }
 
-  if (!response.ok) {
-    throw new Error(data.message || data.error || "Request failed");
+  const data = JSON.parse(text);
+
+  if (!response.ok && response.status !== 401) {
+    throw new Error(data.message || "Request failed");
   }
 
   return data;
