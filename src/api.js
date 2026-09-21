@@ -1,7 +1,6 @@
 const API_BASE = "http://localhost:8081/STUDENT_MART/backend/api";
-
 async function request(endpoint, options = {}) {
-  const response = await fetch(`${API_BASE}/${endpoint}`, {
+  const response = await fetch(endpoint, {
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
@@ -10,6 +9,8 @@ async function request(endpoint, options = {}) {
     ...options,
   });
 
+  return response.json();
+}
   const text = await response.text();
 
   console.log("API Response:", text);
