@@ -1,7 +1,8 @@
 <?php
 // api/health.php
 // Basic health check for PHP runtime, DB connectivity, and session state.
-
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 require_once __DIR__ . '/../includes/header.php';
 
 header("Content-Type: application/json");
