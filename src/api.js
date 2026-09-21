@@ -1,6 +1,7 @@
 const API_BASE = "http://localhost:8081/STUDENT_MART/backend/api";
+
 async function request(endpoint, options = {}) {
-  const response = await fetch(endpoint, {
+  const response = await fetch(`${API_BASE}/${endpoint}`, {
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
@@ -9,24 +10,29 @@ async function request(endpoint, options = {}) {
     ...options,
   });
 
-  return response.json();
-}
   const text = await response.text();
-
   console.log("API Response:", text);
 
   if (!text.trim()) {
     throw new Error("Backend returned an empty response.");
   }
 
-  const data = JSON.parse(text);
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    throw new Error("Backend returned invalid JSON:\n" + text);
+  }
 
   if (!response.ok && response.status !== 401) {
-    throw new Error(data.message || "Request failed");
+    throw new Error(data.error || data.message || "Request failed");
   }
 
   return data;
 }
+
+
+
 
 export async function register(userData) {
   const payload = typeof userData === "object" && userData !== null
