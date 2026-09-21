@@ -17,12 +17,6 @@ if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
 /* ---------- Database ---------- */
 require_once __DIR__ . "/../config/db.php";
 
-session_start();
-
-header("Content-Type: application/json");
-
-require_once __DIR__ . "/../config/db.php";
-
 function jsonResponse($data) {
     echo json_encode($data);
     exit();
@@ -44,4 +38,3 @@ function sanitize($value) {
 function isLoggedIn() {
     return isset($_SESSION["user_id"]);
 }
-?>
