@@ -61,9 +61,14 @@ export default function ProductDetailPage({
               {product.contact}
             </p>
             <button
-              onClick={() => {
-                if (product.contact) {
-                  window.location.href = `mailto:${product.contact}`;
+              onClick={async () => {
+                if (!product.contact) return;
+
+                try {
+                  await navigator.clipboard.writeText(product.contact);
+                  alert('Seller email copied to your clipboard.');
+                } catch {
+                  alert(`Contact the seller at ${product.contact}`);
                 }
               }}
               className="btn btn-primary btn-block"
