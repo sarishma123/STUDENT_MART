@@ -17,6 +17,30 @@ import DashboardPage from './Pages/Dashboard';
 import ProfilePage from './Pages/profile';
 import StartupCheckPage from './Pages/StartupCheck';
 
+const categoryIds = {
+  Textbooks: 1,
+  Notes: 2,
+  Calculators: 3,
+  'Lab Equipment': 4,
+  Stationery: 5,
+  Electronics: 6,
+  'Hostel Essentials': 7,
+  Other: 9,
+};
+
+function normalizeCategory(categoryName) {
+  const value = String(categoryName || '').toLowerCase();
+
+  if (value.includes('book')) return 'Textbooks';
+  if (value.includes('note') || value.includes('study')) return 'Notes';
+  if (value.includes('calculator')) return 'Calculators';
+  if (value.includes('lab')) return 'Lab Equipment';
+  if (value.includes('station')) return 'Stationery';
+  if (value.includes('electronic')) return 'Electronics';
+  if (value.includes('hostel')) return 'Hostel Essentials';
+  return 'Other';
+}
+
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
@@ -37,7 +61,7 @@ export default function App() {
     id: Number(p.product_id),
     title: p.title || 'Untitled',
     seller: p.full_name || 'Student',
-    category: p.category_name || 'Other',
+    category: normalizeCategory(p.category_name),
     price: Number(p.price) || 0,
     condition: p.condition || 'Good',
     image: p.image || null,
@@ -200,7 +224,7 @@ export default function App() {
     try {
       const payload = {
         title: productData.title,
-        category_id: 1,
+        category_id: categoryIds[productData.category] || categoryIds.Other,
         description: productData.description || '',
         price: Number(productData.price),
         condition: productData.condition || 'Good',
@@ -233,7 +257,7 @@ export default function App() {
       const payload = {
         product_id: updatedProduct.id,
         title: updatedProduct.title,
-        category_id: 1,
+        category_id: categoryIds[updatedProduct.category] || categoryIds.Other,
         description: updatedProduct.description || '',
         price: Number(updatedProduct.price),
         condition: updatedProduct.condition || 'Good',
@@ -276,7 +300,7 @@ export default function App() {
       await api.updateProduct({
         product_id: productId,
         title: selectedProduct.title,
-        category_id: 1,
+        category_id: categoryIds[selectedProduct.category] || categoryIds.Other,
         description: selectedProduct.description,
         price: selectedProduct.price,
         condition: selectedProduct.condition,

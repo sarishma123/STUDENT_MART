@@ -26,6 +26,24 @@ export default function EditProductPage({ product, onUpdate, setCurrentPage }) {
         </label>
 
         <label className="field-group">
+          Category
+          <select
+            value={formData.category || 'Notes'}
+            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+            className="field"
+          >
+            <option>Notes</option>
+            <option>Textbooks</option>
+            <option>Calculators</option>
+            <option>Lab Equipment</option>
+            <option>Stationery</option>
+            <option>Electronics</option>
+            <option>Hostel Essentials</option>
+            <option>Other</option>
+          </select>
+        </label>
+
+        <label className="field-group">
           Description
           <textarea
             value={formData.description || ''}
