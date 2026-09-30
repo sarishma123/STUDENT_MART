@@ -53,8 +53,11 @@ export default function App() {
       const data = await api.getProducts();
       const apiProducts = data.products || data;
       const mapped = Array.isArray(apiProducts) ? apiProducts.map(mapApiProduct) : [];
-      setProducts(mapped);
-      setFilteredProducts(mapped);
+      const productsToShow = mapped.length > 0
+        ? mapped
+        : initialProducts.map((p, index) => ({ ...p, id: Number(p.id || index + 1) }));
+      setProducts(productsToShow);
+      setFilteredProducts(productsToShow);
     } catch (error) {
       console.warn('Backend not available, using demo data:', error.message);
       const mapped = initialProducts.map((p, index) => ({ ...p, id: Number(p.id || index + 1) }));
