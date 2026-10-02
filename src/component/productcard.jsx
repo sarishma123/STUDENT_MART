@@ -7,7 +7,11 @@ export default function ProductCard({
   return (
     <article className={`product-card ${product.isSold ? 'product-card--sold' : ''}`} onClick={onViewDetails}>
       <div className="product-card__media">
-        <span aria-hidden="true">{product.image}</span>
+        {product.image && String(product.image).match(/^(https?:\/\/|\/|data:)/) ? (
+          <img src={product.image} alt="" />
+        ) : (
+          <span className="product-card__media-placeholder">Item photo</span>
+        )}
 
         {product.isSold && <span className="product-card__sold-tag">Sold</span>}
 
@@ -19,7 +23,7 @@ export default function ProductCard({
           className="product-card__wishlist"
           aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
         >
-          {isWishlisted ? '❤️' : '🤍'}
+          {isWishlisted ? 'Saved' : 'Save'}
         </button>
       </div>
 
@@ -34,7 +38,7 @@ export default function ProductCard({
 
         <div className="product-card__footer">
           <span className="product-card__price">
-            ₹{product.price}
+            Rs. {product.price}
           </span>
           <span className="product-card__badge">
             {product.condition}

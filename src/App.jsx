@@ -367,6 +367,11 @@ export default function App() {
   const renderHome = () => (
     <HomePage
       products={filteredProducts}
+      categories={categories}
+      selectedCategory={selectedCategory}
+      onSelectCategory={setSelectedCategory}
+      searchQuery={searchQuery}
+      onSearchChange={setSearchQuery}
       wishlist={wishlist}
       onToggleWishlist={toggleWishlist}
       onViewDetails={(id) => setCurrentPage(`product-${id}`)}
