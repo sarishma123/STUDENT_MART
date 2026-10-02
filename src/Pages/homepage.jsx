@@ -2,11 +2,6 @@ import ProductCard from '../component/productcard';
 
 export default function HomePage({
   products,
-  categories,
-  selectedCategory,
-  onSelectCategory,
-  searchQuery,
-  onSearchChange,
   wishlist,
   onToggleWishlist,
   onViewDetails,
@@ -14,51 +9,29 @@ export default function HomePage({
 }) {
   return (
     <div className="page page--wide">
-      <section className="home-intro">
-        <div>
-          <p className="eyebrow">Student-to-student marketplace</p>
-          <h1 className="home-title">Useful things, fair prices.</h1>
-          <p className="home-copy">
-            Find books, notes, and everyday campus essentials from people at your college.
-          </p>
-        </div>
-        <button onClick={onLoginClick} className="btn btn-primary">Sell an Item</button>
-      </section>
+      <section className="hero-section">
+        <h1 className="hero-title">
+          🎓 On-Campus Mart
+        </h1>
+        <h2 className="hero-subtitle">
+          Give Your Old Notes a Second Life
+        </h2>
+        <p className="hero-copy">
+          Find affordable study materials from seniors. Sell your old books, notes, and equipment to help fellow students. Save money. Reduce waste. Support your campus community.
+        </p>
 
-      <section className="marketplace-tools" aria-label="Find an item">
-        <label className="home-search">
-          <span aria-hidden="true">⌕</span>
-          <input
-            value={searchQuery}
-            onChange={(event) => onSearchChange(event.target.value)}
-            placeholder="Search books, notes, calculators..."
-            aria-label="Search listings"
-          />
-        </label>
-        <div className="category-filters" aria-label="Filter by category">
-          {categories.map((category) => (
-            <button
-              key={category}
-              type="button"
-              className={`category-filter ${selectedCategory === category ? 'category-filter--active' : ''}`}
-              onClick={() => onSelectCategory(category)}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <section className="home-listings">
-        <div className="section-heading-row">
-          <div>
-            <h2 className="section-title">Recently posted</h2>
-            <p className="muted section-subtitle">{products.length} items available</p>
-          </div>
-          <button type="button" className="text-button" onClick={() => onSelectCategory('All')}>
-            Clear filters
+        <div className="hero-actions">
+          <button onClick={onLoginClick} className="btn btn-secondary">
+            Browse Items
+          </button>
+          <button onClick={onLoginClick} className="btn btn-ghost">
+             Sell Now
           </button>
         </div>
+      </section>
+
+      <section className="section-surface">
+        <h2 className="section-title"> Recently Posted</h2>
         <div className="product-grid">
           {products.slice(0, 6).map((product) => (
             <ProductCard
@@ -70,15 +43,38 @@ export default function HomePage({
             />
           ))}
         </div>
-        {products.length === 0 && <p className="empty-state">No items match your search. Try another term or category.</p>}
       </section>
 
-      <section className="sell-strip">
+      <section className="section-surface section-surface--tinted">
         <div>
-          <h2 className="sell-strip__title">Have something a student could use?</h2>
-          <p className="muted">List it in a minute and pass it on to someone nearby.</p>
+          <h2 className="section-title section-title--center">✨ Why On-Campus Mart?</h2>
+          <div className="feature-grid">
+            {[
+              { title: ' Save Money', desc: 'Buy textbooks and notes at 50-70% off retail prices' },
+              { title: ' Help Juniors', desc: 'Sell your old materials to next semester students' },
+              { title: ' Be Green', desc: 'Reduce paper waste and support sustainability' },
+              { title: ' Easy & Safe', desc: 'Connect directly with students in your college' },
+            ].map((item) => (
+              <div key={item.title} className="feature-card">
+                <h3 className="feature-title">
+                  {item.title}
+                </h3>
+                <p className="muted feature-copy">{item.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
-        <button onClick={onLoginClick} className="btn btn-secondary">Sell an Item</button>
+      </section>
+
+      <section className="section-surface">
+        <h2 className="section-title"> Popular Categories</h2>
+        <div className="category-grid">
+          {['Notes', 'Textbooks', ' Calculators', ' Lab Equipment', ' Stationery', ' Electronics'].map(
+            (cat) => (
+              <button key={cat} className="chip-button">{cat}</button>
+            )
+          )}
+        </div>
       </section>
     </div>
   );

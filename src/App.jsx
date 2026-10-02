@@ -4,7 +4,7 @@ import './App.css';
 import Header from './component/header';
 import Footer from './component/footer';
 
-import { categories, initialProducts } from './Data/product';
+import { categories } from './Data/product';
 import { api } from './api';
 
 import AuthPage from './Pages/AuthPage';
@@ -79,16 +79,12 @@ export default function App() {
       const data = await api.getProducts();
       const apiProducts = data.products || data;
       const mapped = Array.isArray(apiProducts) ? apiProducts.map(mapApiProduct) : [];
-      const productsToShow = mapped.length > 0
-        ? mapped
-        : initialProducts.map((p, index) => ({ ...p, id: Number(p.id || index + 1) }));
-      setProducts(productsToShow);
-      setFilteredProducts(productsToShow);
-    } catch (error) {
-      console.warn('Backend not available, using demo data:', error.message);
-      const mapped = initialProducts.map((p, index) => ({ ...p, id: Number(p.id || index + 1) }));
       setProducts(mapped);
       setFilteredProducts(mapped);
+    } catch (error) {
+      console.warn('Could not load products:', error.message);
+      setProducts([]);
+      setFilteredProducts([]);
     } finally {
       setLoading(false);
     }
@@ -367,11 +363,6 @@ export default function App() {
   const renderHome = () => (
     <HomePage
       products={filteredProducts}
-      categories={categories}
-      selectedCategory={selectedCategory}
-      onSelectCategory={setSelectedCategory}
-      searchQuery={searchQuery}
-      onSearchChange={setSearchQuery}
       wishlist={wishlist}
       onToggleWishlist={toggleWishlist}
       onViewDetails={(id) => setCurrentPage(`product-${id}`)}
