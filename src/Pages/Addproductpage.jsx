@@ -72,7 +72,7 @@ export default function AddProductPage({ onAddProduct, setCurrentPage }) {
 
         <div className="field-grid">
           <label className="field-group">
-            Price (₹) *
+            Price (Rs.) *
             <input
               type="number"
               placeholder="0"

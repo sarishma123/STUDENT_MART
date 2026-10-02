@@ -53,7 +53,7 @@ export default function EditProductPage({ product, onUpdate, setCurrentPage }) {
         </label>
 
         <label className="field-group">
-          Price (₹)
+            Price (Rs.)
           <input
             type="number"
             value={formData.price}

@@ -69,7 +69,7 @@ export default function DashboardPage({
               {userProducts.map((item) => (
                 <tr key={item.id}>
                   <td>{item.title}</td>
-                  <td className="text-primary text-strong">₹{item.price}</td>
+                  <td className="text-primary text-strong">Rs. {item.price}</td>
                   <td className="muted">{item.category}</td>
                   <td>
                     <span className={`status-pill ${item.isSold ? 'status-pill--sold' : 'status-pill--active'}`}>
@@ -123,7 +123,7 @@ export default function DashboardPage({
               {myPurchasedItems.map((item) => (
                 <tr key={`purchase-${item.id}`}>
                   <td>{item.title}</td>
-                  <td className="text-primary text-strong">₹{item.price}</td>
+                  <td className="text-primary text-strong">Rs. {item.price}</td>
                   <td className="muted">{item.seller}</td>
                   <td className="muted">{item.soldAt || 'Recently'}</td>
                 </tr>
