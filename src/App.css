@@ -872,6 +872,21 @@ select:focus-visible {
   background: rgba(244, 247, 251, 0.72);
 }
 
+.change-password-card {
+  padding: 2rem;
+}
+
+.change-password-icon {
+  width: 3.25rem;
+  height: 3.25rem;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 1rem;
+  border-radius: 16px;
+  color: var(--primary);
+  background: var(--primary-soft);
+}
+
 .profile-setting--danger {
   color: #c53030;
   background: rgba(197, 48, 48, 0.08);

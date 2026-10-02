@@ -15,6 +15,7 @@ import AddProductPage from './Pages/Addproductpage';
 import EditProductPage from './Pages/editproduct';
 import DashboardPage from './Pages/Dashboard';
 import ProfilePage from './Pages/profile';
+import ChangePasswordPage from './Pages/ChangePasswordPage';
 import StartupCheckPage from './Pages/StartupCheck';
 
 const categoryIds = {
@@ -441,10 +442,18 @@ export default function App() {
         return (
           <ProfilePage
             currentUser={currentUser}
-            onChangePassword={handleChangePassword}
+            onChangePasswordPage={() => setCurrentPage('change-password')}
             onLogout={handleLogout}
             onGoToDashboard={() => setCurrentPage('dashboard')}
             userProductCount={userProducts.length}
+          />
+        );
+
+      case 'change-password':
+        return (
+          <ChangePasswordPage
+            onChangePassword={handleChangePassword}
+            onBack={() => setCurrentPage('profile')}
           />
         );
 
