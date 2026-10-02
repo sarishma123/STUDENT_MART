@@ -1,11 +1,20 @@
 <?php
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-$host = "127.0.0.1";      // Don't use localhost
-$user = "root";
-$password = "";           // XAMPP default password is empty
-$database = "on_campus_mart";
-$port = 3306;
+$configPath = getenv('STUDENT_MART_CONFIG')
+    ?: dirname(__DIR__, 4) . DIRECTORY_SEPARATOR . 'student_mart_config' . DIRECTORY_SEPARATOR . 'db.php';
+
+if (!is_file($configPath)) {
+    http_response_code(500);
+    die(json_encode(['success' => false, 'error' => 'Database configuration is unavailable']));
+}
+
+$config = require $configPath;
+$host = $config['host'];
+$user = $config['user'];
+$password = $config['password'];
+$database = $config['database'];
+$port = $config['port'];
 
 try {
     $conn = new mysqli($host, $user, $password, $database, $port);
@@ -14,7 +23,6 @@ try {
     http_response_code(500);
     die(json_encode([
         "success" => false,
-        "error" => "Database connection failed",
-        "details" => $e->getMessage()
+        "error" => "Database connection failed"
     ]));
 }
