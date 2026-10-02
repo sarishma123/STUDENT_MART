@@ -505,14 +505,7 @@ export default function App() {
         setCurrentPage={setCurrentPage}
         handleLogout={handleLogout}
         onLoginClick={() => openAuth('login', 'home')}
-        onBuySellClick={() => {
-          if (isLoggedIn) {
-            setCurrentPage('dashboard');
-            return;
-          }
-
-          openAuth('login', 'dashboard');
-        }}
+        onBuySellClick={() => setCurrentPage('browse')}
         isLoggedIn={isLoggedIn}
       />
 
