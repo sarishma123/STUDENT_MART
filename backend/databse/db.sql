@@ -15,6 +15,17 @@ CREATE TABLE IF NOT EXISTS users (
   campus VARCHAR(100),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- One-time password reset tokens
+CREATE TABLE IF NOT EXISTS password_resets (
+  reset_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  user_id INT NOT NULL,
+  token_hash CHAR(64) NOT NULL UNIQUE,
+  expires_at DATETIME NOT NULL,
+  used_at DATETIME NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
  
 -- Categories Table
 CREATE TABLE IF NOT EXISTS categories (
