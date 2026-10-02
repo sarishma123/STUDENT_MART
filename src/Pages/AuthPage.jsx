@@ -172,12 +172,17 @@ export default function AuthPage({
     <div className="auth-page">
       <div className="auth-card">
         <h1 className="auth-title">
-          {mode === 'login' ? '👋 Welcome Back!' : '✨ Join Campus Community'}
+          {mode === 'login' && '👋 Welcome Back!'}
+          {mode === 'register' && '✨ Join Campus Community'}
+          {mode === 'forgot' && 'Reset Your Password'}
+          {mode === 'reset' && 'Choose a New Password'}
         </h1>
         <p className="auth-subtitle">
           {mode === 'login'
             ? 'Sign in to find affordable study materials'
-            : 'Share and sell your old notes, books, and study materials'}
+            : mode === 'register'
+              ? 'Share and sell your old notes, books, and study materials'
+              : 'Keep your StudentMart account secure'}
         </p>
 
         {mode !== 'forgot' && mode !== 'reset' && <div className="auth-tabs">
@@ -200,7 +205,7 @@ export default function AuthPage({
           <div className="auth-tab-indicator" style={{ transform: mode === 'login' ? 'translateX(0)' : 'translateX(100%)' }} />
         </div>}
 
-        <div className="auth-slider">
+        {mode !== 'forgot' && mode !== 'reset' && <div className="auth-slider">
           <div className="auth-slider__inner" style={{ transform: mode === 'register' ? 'translateX(-50%)' : 'translateX(0)' }}>
             <form onSubmit={handleLogin} className="auth-form">
               <label className="field-group">
@@ -304,7 +309,7 @@ export default function AuthPage({
               </button>
             </form>
           </div>
-        </div>
+        </div>}
 
         {mode === 'forgot' && (
           <form onSubmit={handleForgot} className="auth-form auth-form--standalone">

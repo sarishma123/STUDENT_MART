@@ -42,6 +42,7 @@ function normalizeCategory(categoryName) {
 }
 
 export default function App() {
+  const resetToken = new URLSearchParams(window.location.search).get('reset') || '';
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [currentPage, setCurrentPage] = useState('home');
@@ -379,8 +380,8 @@ export default function App() {
 
   const renderPage = () => {
     if (!isLoggedIn) {
-      if (currentPage === 'auth' || currentPage === 'login' || currentPage === 'register') {
-        const initialMode = currentPage === 'register' ? 'register' : 'login';
+      if (resetToken || currentPage === 'auth' || currentPage === 'login' || currentPage === 'register') {
+        const initialMode = resetToken ? 'reset' : currentPage === 'register' ? 'register' : 'login';
         return (
           <AuthPage
             onLogin={handleLogin}
@@ -388,6 +389,7 @@ export default function App() {
             onForgotPassword={handleForgotPassword}
             onResetPassword={handleResetPassword}
             initialMode={initialMode}
+            resetToken={resetToken}
           />
         );
       }
