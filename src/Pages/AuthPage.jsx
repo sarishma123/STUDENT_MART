@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { LogIn, UserPlus } from 'lucide-react';
+import { ArrowLeft, KeyRound, LogIn, Mail, UserPlus } from 'lucide-react';
 
 function sanitizeInput(str) {
   if (typeof str !== 'string') return '';
@@ -9,7 +9,14 @@ function sanitizeInput(str) {
   });
 }
 
-export default function AuthPage({ onLogin, onRegister, initialMode = 'login' }) {
+export default function AuthPage({
+  onLogin,
+  onRegister,
+  onForgotPassword,
+  onResetPassword,
+  initialMode = 'login',
+  resetToken = '',
+}) {
   const [mode, setMode] = useState(initialMode);
 
   const [loginEmail, setLoginEmail] = useState('');
@@ -21,6 +28,12 @@ export default function AuthPage({ onLogin, onRegister, initialMode = 'login' })
   const [regPassword, setRegPassword] = useState('');
   const [regConfirm, setRegConfirm] = useState('');
   const [regError, setRegError] = useState('');
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotError, setForgotError] = useState('');
+  const [forgotMessage, setForgotMessage] = useState('');
+  const [resetPassword, setResetPassword] = useState('');
+  const [resetConfirm, setResetConfirm] = useState('');
+  const [resetError, setResetError] = useState('');
 
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
@@ -92,14 +105,67 @@ export default function AuthPage({ onLogin, onRegister, initialMode = 'login' })
     }
   };
 
+  const handleForgot = async (e) => {
+    e.preventDefault();
+    setForgotError('');
+    setForgotMessage('');
+
+    const email = sanitizeInput(forgotEmail.trim());
+    if (!validateEmail(email)) {
+      setForgotError('Please enter a valid email address.');
+      return;
+    }
+
+    const result = await onForgotPassword(email);
+    if (result.success) {
+      setForgotMessage(result.message);
+    } else {
+      setForgotError(result.error || 'Could not send reset email.');
+    }
+  };
+
+  const handleReset = async (e) => {
+    e.preventDefault();
+    setResetError('');
+
+    const password = sanitizeInput(resetPassword);
+    const confirm = sanitizeInput(resetConfirm);
+    if (password.length < 6) {
+      setResetError('Password must be at least 6 characters.');
+      return;
+    }
+    if (password !== confirm) {
+      setResetError('Passwords do not match.');
+      return;
+    }
+
+    const result = await onResetPassword(resetToken, password);
+    if (result.success) {
+      setLoginError(result.message || 'Password updated. You can now sign in.');
+      setMode('login');
+      setResetPassword('');
+      setResetConfirm('');
+    } else {
+      setResetError(result.error || 'Could not reset your password.');
+    }
+  };
+
   const switchToLogin = () => {
     setMode('login');
     setLoginError('');
+    setForgotError('');
+    setForgotMessage('');
   };
 
   const switchToRegister = () => {
     setMode('register');
     setRegError('');
+  };
+
+  const switchToForgot = () => {
+    setMode('forgot');
+    setForgotError('');
+    setForgotMessage('');
   };
 
   return (
@@ -114,7 +180,7 @@ export default function AuthPage({ onLogin, onRegister, initialMode = 'login' })
             : 'Share and sell your old notes, books, and study materials'}
         </p>
 
-        <div className="auth-tabs">
+        {mode !== 'forgot' && mode !== 'reset' && <div className="auth-tabs">
           <button
             type="button"
             className={`auth-tab ${mode === 'login' ? 'auth-tab--active' : ''}`}
@@ -132,10 +198,10 @@ export default function AuthPage({ onLogin, onRegister, initialMode = 'login' })
             Create Account
           </button>
           <div className="auth-tab-indicator" style={{ transform: mode === 'login' ? 'translateX(0)' : 'translateX(100%)' }} />
-        </div>
+        </div>}
 
         <div className="auth-slider">
-          <div className="auth-slider__inner" style={{ transform: mode === 'login' ? 'translateX(0)' : 'translateX(-50%)' }}>
+          <div className="auth-slider__inner" style={{ transform: mode === 'register' ? 'translateX(-50%)' : 'translateX(0)' }}>
             <form onSubmit={handleLogin} className="auth-form">
               <label className="field-group">
                 Email
@@ -163,6 +229,10 @@ export default function AuthPage({ onLogin, onRegister, initialMode = 'login' })
               </label>
 
               {loginError && <p className="auth-error">{loginError}</p>}
+
+              {mode === 'login' && <button type="button" className="auth-link" onClick={switchToForgot}>
+                Forgot your password?
+              </button>}
 
               <button type="submit" className="btn btn-primary btn-block">
                 <LogIn size={18} />
@@ -235,6 +305,36 @@ export default function AuthPage({ onLogin, onRegister, initialMode = 'login' })
             </form>
           </div>
         </div>
+
+        {mode === 'forgot' && (
+          <form onSubmit={handleForgot} className="auth-form auth-form--standalone">
+            <p className="auth-helper">Enter your email and we will send you a one-hour password reset link.</p>
+            <label className="field-group">
+              Email
+              <input type="email" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} className="field" required autoComplete="email" />
+            </label>
+            {forgotError && <p className="auth-error">{forgotError}</p>}
+            {forgotMessage && <p className="auth-success">{forgotMessage}</p>}
+            <button type="submit" className="btn btn-primary btn-block"><Mail size={18} /> Send Reset Link</button>
+            <button type="button" className="auth-link" onClick={switchToLogin}><ArrowLeft size={15} /> Back to sign in</button>
+          </form>
+        )}
+
+        {mode === 'reset' && (
+          <form onSubmit={handleReset} className="auth-form auth-form--standalone">
+            <p className="auth-helper">Choose a new password for your StudentMart account.</p>
+            <label className="field-group">
+              New Password
+              <input type="password" value={resetPassword} onChange={(e) => setResetPassword(e.target.value)} className="field" required minLength={6} autoComplete="new-password" />
+            </label>
+            <label className="field-group">
+              Confirm Password
+              <input type="password" value={resetConfirm} onChange={(e) => setResetConfirm(e.target.value)} className="field" required minLength={6} autoComplete="new-password" />
+            </label>
+            {resetError && <p className="auth-error">{resetError}</p>}
+            <button type="submit" className="btn btn-primary btn-block"><KeyRound size={18} /> Update Password</button>
+          </form>
+        )}
       </div>
     </div>
   );

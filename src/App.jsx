@@ -205,6 +205,24 @@ export default function App() {
     }
   };
 
+  const handleForgotPassword = async (email) => {
+    try {
+      const data = await api.forgotPassword(email);
+      return { success: true, message: data.message };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  };
+
+  const handleResetPassword = async (token, password) => {
+    try {
+      const data = await api.resetPassword(token, password);
+      return { success: true, message: data.message };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await api.logout();
@@ -367,6 +385,8 @@ export default function App() {
           <AuthPage
             onLogin={handleLogin}
             onRegister={handleRegister}
+            onForgotPassword={handleForgotPassword}
+            onResetPassword={handleResetPassword}
             initialMode={initialMode}
           />
         );

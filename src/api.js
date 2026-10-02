@@ -39,6 +39,9 @@ export const api = {
   login: (email, password) => jsonRequest('/auth.php', { type: 'login', email, password }),
   register: (name, email, password) =>
     jsonRequest('/auth.php', { type: 'register', name, email, password }),
+  forgotPassword: (email) => jsonRequest('/auth.php', { type: 'forgot-password', email }),
+  resetPassword: (token, password) =>
+    jsonRequest('/auth.php', { type: 'reset-password', token, password }),
   logout: () => jsonRequest('/auth.php', { logout: true }),
   getCurrentUser: () => apiRequest('/auth.php'),
   getProducts: () => apiRequest('/browse.php'),
