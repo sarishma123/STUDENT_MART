@@ -69,6 +69,34 @@ if ($action === 'POST') {
             ]
         ]);
 
+    } elseif ($type === 'change-password') {
+        if (!isLoggedIn()) {
+            jsonError('Authentication required', 401);
+        }
+
+        $currentPassword = isset($input['current_password']) ? $input['current_password'] : '';
+        $newPassword = isset($input['new_password']) ? $input['new_password'] : '';
+
+        if (empty($currentPassword) || strlen($newPassword) < 6) {
+            jsonError('Current password and a new password of at least 6 characters are required.');
+        }
+
+        $stmt = $conn->prepare("SELECT password FROM users WHERE user_id = ?");
+        $stmt->bind_param("i", $_SESSION['user_id']);
+        $stmt->execute();
+        $user = $stmt->get_result()->fetch_assoc();
+
+        if (!$user || !password_verify($currentPassword, $user['password'])) {
+            jsonError('Current password is incorrect.', 401);
+        }
+
+        $newPasswordHash = password_hash($newPassword, PASSWORD_DEFAULT);
+        $update = $conn->prepare("UPDATE users SET password = ? WHERE user_id = ?");
+        $update->bind_param("si", $newPasswordHash, $_SESSION['user_id']);
+        $update->execute();
+
+        jsonResponse(['success' => true, 'message' => 'Password changed successfully.']);
+
     } elseif ($type === 'register') {
         $name = isset($input['name']) ? sanitize($input['name']) : '';
         $email = isset($input['email']) ? sanitize($input['email']) : '';

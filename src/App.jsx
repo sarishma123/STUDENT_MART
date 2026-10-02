@@ -224,6 +224,15 @@ export default function App() {
     }
   };
 
+  const handleChangePassword = async (currentPassword, newPassword) => {
+    try {
+      const data = await api.changePassword(currentPassword, newPassword);
+      return { success: true, message: data.message };
+    } catch (error) {
+      return { success: false, error: error.message };
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await api.logout();
@@ -432,6 +441,7 @@ export default function App() {
         return (
           <ProfilePage
             currentUser={currentUser}
+            onChangePassword={handleChangePassword}
             onLogout={handleLogout}
             onGoToDashboard={() => setCurrentPage('dashboard')}
             userProductCount={userProducts.length}
