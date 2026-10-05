@@ -8,6 +8,15 @@ function getCsrfToken() {
   return cookie ? decodeURIComponent(cookie.split('=').slice(1).join('=')) : ''
 }
 
+async function ensureCsrfToken() {
+  let token = getCsrfToken()
+  if (!token) {
+    await fetch(`${API_BASE}/auth.php`, { credentials: 'include' })
+    token = getCsrfToken()
+  }
+  return token
+}
+
 export async function apiRequest(endpoint, options = {}) {
   const method = (options.method || 'GET').toUpperCase()
   const headers = {
@@ -17,7 +26,7 @@ export async function apiRequest(endpoint, options = {}) {
   }
 
   if (!['GET', 'HEAD', 'OPTIONS'].includes(method)) {
-    headers['X-CSRF-Token'] = getCsrfToken()
+    headers['X-CSRF-Token'] = await ensureCsrfToken()
   }
 
   const response = await fetch(`${API_BASE}${endpoint}`, {
