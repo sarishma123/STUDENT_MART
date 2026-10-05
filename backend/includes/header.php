@@ -11,17 +11,42 @@ session_set_cookie_params([
 ]);
 session_start();
 
+$csrfToken = isset($_SESSION['csrf_token']) ? $_SESSION['csrf_token'] : bin2hex(random_bytes(32));
+$_SESSION['csrf_token'] = $csrfToken;
+$csrfCookieOptions = [
+    'expires' => time() + 86400,
+    'path' => '/',
+    'secure' => $isHttps,
+    'httponly' => false,
+    'samesite' => 'Lax',
+];
+setcookie('student_mart_csrf', $csrfToken, $csrfCookieOptions);
+
 /* ---------- CORS ---------- */
 header("Access-Control-Allow-Origin: http://localhost:5173");
 header("Access-Control-Allow-Credentials: true");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-CSRF-Token");
+header("Access-Control-Expose-Headers: X-CSRF-Token");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
+header("X-CSRF-Token: " . $csrfToken);
 header("Content-Type: application/json");
 
 /* Handle browser preflight request */
 if ($_SERVER["REQUEST_METHOD"] === "OPTIONS") {
     http_response_code(200);
     exit();
+}
+
+if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'HEAD'], true)) {
+    $providedToken = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+    if (!is_string($providedToken) || !hash_equals($csrfToken, $providedToken)) {
+        http_response_code(403);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Invalid CSRF token'
+        ]);
+        exit();
+    }
 }
 
 /* ---------- Database ---------- */

@@ -1,14 +1,29 @@
 const API_BASE = '/api'
 
+function getCsrfToken() {
+  const cookie = document.cookie
+    .split('; ')
+    .find((value) => value.startsWith('student_mart_csrf='))
+
+  return cookie ? decodeURIComponent(cookie.split('=').slice(1).join('=')) : ''
+}
+
 export async function apiRequest(endpoint, options = {}) {
+  const method = (options.method || 'GET').toUpperCase()
+  const headers = {
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+    ...options.headers,
+  }
+
+  if (!['GET', 'HEAD', 'OPTIONS'].includes(method)) {
+    headers['X-CSRF-Token'] = getCsrfToken()
+  }
+
   const response = await fetch(`${API_BASE}${endpoint}`, {
     ...options,
     credentials: 'include',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
+    headers,
   })
 
   const contentType = response.headers.get('content-type') || ''
