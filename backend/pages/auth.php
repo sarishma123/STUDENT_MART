@@ -27,14 +27,15 @@ if (!is_array($input)) {
 if ($action === 'POST') {
     if (isLoggedIn() && !empty($input['logout'])) {
         $_SESSION = [];
-        setcookie(session_name(), '', [
-            'expires' => time() - 42000,
+        session_regenerate_id(true);
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        setcookie('student_mart_csrf', $_SESSION['csrf_token'], [
+            'expires' => time() + 86400,
             'path' => '/',
             'secure' => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
-            'httponly' => true,
+            'httponly' => false,
             'samesite' => 'Lax',
         ]);
-        session_destroy();
         jsonResponse(['success' => true, 'message' => 'Logged out']);
     }
 
