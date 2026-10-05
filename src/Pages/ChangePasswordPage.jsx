@@ -1,5 +1,6 @@
 import { ArrowLeft, KeyRound } from 'lucide-react';
 import { useState } from 'react';
+import { isStrongPassword, PASSWORD_REQUIREMENTS } from '../passwordPolicy';
 
 export default function ChangePasswordPage({ onChangePassword, onBack }) {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -13,8 +14,8 @@ export default function ChangePasswordPage({ onChangePassword, onBack }) {
     setPasswordMessage('');
     setPasswordError('');
 
-    if (newPassword.length < 6) {
-      setPasswordError('New password must be at least 6 characters.');
+    if (!isStrongPassword(newPassword)) {
+      setPasswordError(PASSWORD_REQUIREMENTS);
       return;
     }
 
@@ -69,7 +70,7 @@ export default function ChangePasswordPage({ onChangePassword, onBack }) {
               value={newPassword}
               onChange={(event) => setNewPassword(event.target.value)}
               required
-              minLength={6}
+              minLength={9}
               autoComplete="new-password"
             />
           </label>
@@ -81,7 +82,7 @@ export default function ChangePasswordPage({ onChangePassword, onBack }) {
               value={confirmPassword}
               onChange={(event) => setConfirmPassword(event.target.value)}
               required
-              minLength={6}
+              minLength={9}
               autoComplete="new-password"
             />
           </label>

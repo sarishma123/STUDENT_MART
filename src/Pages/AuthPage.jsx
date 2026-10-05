@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ArrowLeft, KeyRound, LogIn, Mail, UserPlus } from 'lucide-react';
+import { isStrongPassword, PASSWORD_REQUIREMENTS } from '../passwordPolicy';
 
 function sanitizeInput(str) {
   if (typeof str !== 'string') return '';
@@ -54,11 +55,6 @@ export default function AuthPage({
       return;
     }
 
-    if (password.length < 6) {
-      setLoginError('Password must be at least 6 characters.');
-      return;
-    }
-
     const result = await onLogin(email, password);
     if (!result.success) {
       setLoginError(result.error || 'Login failed');
@@ -89,8 +85,8 @@ export default function AuthPage({
       return;
     }
 
-    if (password.length < 6) {
-      setRegError('Password must be at least 6 characters.');
+    if (!isStrongPassword(password)) {
+      setRegError(PASSWORD_REQUIREMENTS);
       return;
     }
 
@@ -130,8 +126,8 @@ export default function AuthPage({
 
     const password = sanitizeInput(resetPassword);
     const confirm = sanitizeInput(resetConfirm);
-    if (password.length < 6) {
-      setResetError('Password must be at least 6 characters.');
+    if (!isStrongPassword(password)) {
+      setResetError(PASSWORD_REQUIREMENTS);
       return;
     }
     if (password !== confirm) {
@@ -277,12 +273,12 @@ export default function AuthPage({
                 Password
                 <input
                   type="password"
-                  placeholder="At least 6 characters"
+                  placeholder="9+ chars, upper/lowercase, number, symbol"
                   value={regPassword}
                   onChange={(e) => setRegPassword(e.target.value)}
                   className="field"
                   required
-                  minLength={6}
+                  minLength={9}
                   autoComplete="new-password"
                 />
               </label>
@@ -296,7 +292,7 @@ export default function AuthPage({
                   onChange={(e) => setRegConfirm(e.target.value)}
                   className="field"
                   required
-                  minLength={6}
+                  minLength={9}
                   autoComplete="new-password"
                 />
               </label>
@@ -330,11 +326,11 @@ export default function AuthPage({
             <p className="auth-helper">Choose a new password for your StudentMart account.</p>
             <label className="field-group">
               New Password
-              <input type="password" value={resetPassword} onChange={(e) => setResetPassword(e.target.value)} className="field" required minLength={6} autoComplete="new-password" />
+              <input type="password" value={resetPassword} onChange={(e) => setResetPassword(e.target.value)} className="field" required minLength={9} autoComplete="new-password" />
             </label>
             <label className="field-group">
               Confirm Password
-              <input type="password" value={resetConfirm} onChange={(e) => setResetConfirm(e.target.value)} className="field" required minLength={6} autoComplete="new-password" />
+              <input type="password" value={resetConfirm} onChange={(e) => setResetConfirm(e.target.value)} className="field" required minLength={9} autoComplete="new-password" />
             </label>
             {resetError && <p className="auth-error">{resetError}</p>}
             <button type="submit" className="btn btn-primary btn-block"><KeyRound size={18} /> Update Password</button>

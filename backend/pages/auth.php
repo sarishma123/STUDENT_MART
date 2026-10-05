@@ -7,6 +7,14 @@ error_reporting(E_ALL);
 require_once __DIR__ . "/../includes/header.php";
 require_once __DIR__ . "/../includes/mailer.php";
 
+function isStrongPassword(string $password): bool {
+    return strlen($password) >= 9
+        && preg_match('/[A-Z]/', $password)
+        && preg_match('/[a-z]/', $password)
+        && preg_match('/[0-9]/', $password)
+        && preg_match('/[^A-Za-z0-9]/', $password);
+}
+
 // Keeps existing installations compatible; the same statement is also in db.sql.
 $conn->query("CREATE TABLE IF NOT EXISTS password_resets (
     reset_id BIGINT PRIMARY KEY AUTO_INCREMENT,
@@ -86,8 +94,8 @@ if ($action === 'POST') {
         $currentPassword = isset($input['current_password']) ? $input['current_password'] : '';
         $newPassword = isset($input['new_password']) ? $input['new_password'] : '';
 
-        if (empty($currentPassword) || strlen($newPassword) < 6) {
-            jsonError('Current password and a new password of at least 6 characters are required.');
+        if (empty($currentPassword) || !isStrongPassword($newPassword)) {
+            jsonError('New password must be at least 9 characters and include uppercase, lowercase, a number, and a symbol.');
         }
 
         $stmt = $conn->prepare("SELECT password FROM users WHERE user_id = ?");
@@ -115,8 +123,8 @@ if ($action === 'POST') {
             jsonError('All fields are required');
         }
 
-        if (strlen($password) < 6) {
-            jsonError('Password must be at least 6 characters');
+        if (!isStrongPassword($password)) {
+            jsonError('Password must be at least 9 characters and include uppercase, lowercase, a number, and a symbol.');
         }
 
         $check = $conn->prepare("SELECT user_id FROM users WHERE email = ?");
@@ -200,8 +208,8 @@ if ($action === 'POST') {
         $token = isset($input['token']) ? trim($input['token']) : '';
         $password = isset($input['password']) ? $input['password'] : '';
 
-        if (!preg_match('/^[a-f0-9]{64}$/', $token) || strlen($password) < 6) {
-            jsonError('A valid reset token and a password of at least 6 characters are required.');
+        if (!preg_match('/^[a-f0-9]{64}$/', $token) || !isStrongPassword($password)) {
+            jsonError('A valid reset token and a password of at least 9 characters with uppercase, lowercase, a number, and a symbol are required.');
         }
 
         $tokenHash = hash('sha256', $token);
