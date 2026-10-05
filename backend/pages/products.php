@@ -46,10 +46,23 @@ function categoryExists(mysqli $conn, int $categoryId): bool {
     return $stmt->get_result()->num_rows === 1;
 }
 
+function positiveInteger($value): int {
+    if (is_int($value) && $value > 0) {
+        return $value;
+    }
+
+    if (!is_string($value) || !preg_match('/^[1-9][0-9]*$/', $value)) {
+        return 0;
+    }
+
+    $parsed = filter_var($value, FILTER_VALIDATE_INT);
+    return $parsed !== false && $parsed > 0 ? $parsed : 0;
+}
+
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {
-    $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
+    $id = positiveInteger($_GET['id'] ?? null);
     
     if ($id > 0) {
         $stmt = $conn->prepare("SELECT p.*, u.full_name, u.email, u.campus, c.category_name 
@@ -82,7 +95,7 @@ if ($method === 'GET') {
         ]);
     }
 
-    $userId = isset($_GET['user_id']) ? intval($_GET['user_id']) : 0;
+    $userId = positiveInteger($_GET['user_id'] ?? null);
     if ($userId > 0) {
         $stmt = $conn->prepare("SELECT p.*, c.category_name FROM products p 
                                 JOIN categories c ON p.category_id = c.category_id
@@ -145,7 +158,7 @@ if ($method === 'PUT') {
     }
 
     $input = readProductInput();
-    $productId = isset($input['product_id']) ? intval($input['product_id']) : 0;
+    $productId = positiveInteger($input['product_id'] ?? null);
     $userId = $_SESSION['user_id'];
 
     if ($productId <= 0) {
@@ -181,7 +194,7 @@ if ($method === 'DELETE') {
     }
 
     $input = readProductInput();
-    $productId = isset($input['product_id']) ? intval($input['product_id']) : 0;
+    $productId = positiveInteger($input['product_id'] ?? null);
     $userId = $_SESSION['user_id'];
 
     if ($productId <= 0) {
