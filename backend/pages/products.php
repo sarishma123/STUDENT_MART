@@ -4,6 +4,48 @@
 
 require_once __DIR__ . '/../includes/header.php';
 
+function readProductInput(): array {
+    $input = json_decode(file_get_contents('php://input'), true);
+    if (!is_array($input)) {
+        jsonError('Request body must be valid JSON.', 400);
+    }
+
+    return $input;
+}
+
+function validateProductInput(array $input, bool $allowStatus = false): array {
+    $title = isset($input['title']) && is_string($input['title']) ? trim($input['title']) : '';
+    $description = isset($input['description']) && is_string($input['description']) ? trim($input['description']) : '';
+    $condition = isset($input['condition']) && is_string($input['condition']) ? trim($input['condition']) : '';
+    $image = isset($input['image']) && is_string($input['image']) ? trim($input['image']) : null;
+    $categoryId = filter_var($input['category_id'] ?? null, FILTER_VALIDATE_INT);
+    $price = $input['price'] ?? null;
+
+    if ($title === '' || strlen($title) > 150 || $description === '' || strlen($description) > 5000
+        || $condition === '' || strlen($condition) > 20 || $categoryId === false || $categoryId < 1
+        || !is_numeric($price) || !is_finite((float)$price) || (float)$price <= 0 || (float)$price > 99999999.99
+        || ($image !== null && strlen($image) > 255)) {
+        jsonError('Invalid product fields.', 422);
+    }
+
+    $status = 'active';
+    if ($allowStatus) {
+        $status = isset($input['status']) && is_string($input['status']) ? trim($input['status']) : 'active';
+        if (!in_array($status, ['active', 'sold'], true)) {
+            jsonError('Invalid product status.', 422);
+        }
+    }
+
+    return [$title, $categoryId, $description, (float)$price, $condition, $image, $status];
+}
+
+function categoryExists(mysqli $conn, int $categoryId): bool {
+    $stmt = $conn->prepare('SELECT category_id FROM categories WHERE category_id = ?');
+    $stmt->bind_param('i', $categoryId);
+    $stmt->execute();
+    return $stmt->get_result()->num_rows === 1;
+}
+
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {
@@ -74,18 +116,12 @@ if ($method === 'POST') {
         jsonError('Authentication required', 401);
     }
 
-    $input = json_decode(file_get_contents('php://input'), true);
+    $input = readProductInput();
     $userId = $_SESSION['user_id'];
 
-    $title = isset($input['title']) ? sanitize($input['title']) : '';
-    $categoryId = isset($input['category_id']) ? intval($input['category_id']) : 0;
-    $description = isset($input['description']) ? sanitize($input['description']) : '';
-    $price = isset($input['price']) ? floatval($input['price']) : 0;
-    $condition = isset($input['condition']) ? sanitize($input['condition']) : '';
-    $image = isset($input['image']) ? sanitize($input['image']) : null;
-
-    if (empty($title) || $categoryId <= 0 || empty($description) || $price <= 0 || empty($condition)) {
-        jsonError('All fields are required');
+    [$title, $categoryId, $description, $price, $condition, $image] = validateProductInput($input);
+    if (!categoryExists($conn, $categoryId)) {
+        jsonError('Invalid category.', 422);
     }
 
     $stmt = $conn->prepare("INSERT INTO products (user_id, title, category_id, description, price, `condition`, image, status)
@@ -108,7 +144,7 @@ if ($method === 'PUT') {
         jsonError('Authentication required', 401);
     }
 
-    $input = json_decode(file_get_contents('php://input'), true);
+    $input = readProductInput();
     $productId = isset($input['product_id']) ? intval($input['product_id']) : 0;
     $userId = $_SESSION['user_id'];
 
@@ -123,13 +159,9 @@ if ($method === 'PUT') {
         jsonError('Product not found or unauthorized', 403);
     }
 
-    $title = isset($input['title']) ? sanitize($input['title']) : '';
-    $categoryId = isset($input['category_id']) ? intval($input['category_id']) : 0;
-    $description = isset($input['description']) ? sanitize($input['description']) : '';
-    $price = isset($input['price']) ? floatval($input['price']) : 0;
-    $condition = isset($input['condition']) ? sanitize($input['condition']) : '';
-    $image = isset($input['image']) ? sanitize($input['image']) : null;
-    $status = isset($input['status']) ? sanitize($input['status']) : 'active';
+    [$title, $categoryId, $description, $price, $condition, $image, $status] = validateProductInput($input, true);
+    if (!categoryExists($conn, $categoryId)) {
+        jsonError('Invalid category.', 422);
 
     $stmt = $conn->prepare("UPDATE products SET title = ?, category_id = ?, description = ?, price = ?, `condition` = ?, image = ?, status = ?
                             WHERE product_id = ? AND user_id = ?");
@@ -147,7 +179,7 @@ if ($method === 'DELETE') {
         jsonError('Authentication required', 401);
     }
 
-    $input = json_decode(file_get_contents('php://input'), true);
+    $input = readProductInput();
     $productId = isset($input['product_id']) ? intval($input['product_id']) : 0;
     $userId = $_SESSION['user_id'];
 

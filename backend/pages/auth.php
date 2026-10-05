@@ -35,6 +35,15 @@ if ((int)$sessionVersionColumn->fetch_assoc()['column_exists'] === 0) {
     $conn->query("ALTER TABLE users ADD COLUMN session_version INT NOT NULL DEFAULT 1 AFTER password");
 }
 
+$roleColumn = $conn->query("SELECT COUNT(*) AS column_exists
+    FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'users'
+      AND COLUMN_NAME = 'role'");
+if ((int)$roleColumn->fetch_assoc()['column_exists'] === 0) {
+    $conn->query("ALTER TABLE users ADD COLUMN role ENUM('user', 'admin') NOT NULL DEFAULT 'user' AFTER session_version");
+}
+
 $conn->query("CREATE TABLE IF NOT EXISTS password_reset_attempts (
     attempt_id BIGINT PRIMARY KEY AUTO_INCREMENT,
     email_hash CHAR(64) NOT NULL,
@@ -75,7 +84,7 @@ if ($action === 'POST') {
             jsonError('Email and password are required');
         }
 
-        $stmt = $conn->prepare("SELECT user_id, full_name, email, password, session_version FROM users WHERE email = ?");
+        $stmt = $conn->prepare("SELECT user_id, full_name, email, password, session_version, role FROM users WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -95,6 +104,7 @@ if ($action === 'POST') {
         $_SESSION['user_name'] = $user['full_name'];
         $_SESSION['user_email'] = $user['email'];
         $_SESSION['session_version'] = (int)$user['session_version'];
+        $_SESSION['role'] = $user['role'];
 
         jsonResponse([
             'success' => true,
@@ -164,6 +174,7 @@ if ($action === 'POST') {
             $_SESSION['user_name'] = $name;
             $_SESSION['user_email'] = $email;
             $_SESSION['session_version'] = 1;
+            $_SESSION['role'] = 'user';
 
             sendAppEmail(
                 $email,

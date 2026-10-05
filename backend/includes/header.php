@@ -98,3 +98,13 @@ function sanitize($value) {
 function isLoggedIn() {
     return isset($_SESSION["user_id"]);
 }
+
+function requireRole(string ...$roles): void {
+    if (!isLoggedIn()) {
+        jsonError('Authentication required', 401);
+    }
+
+    if (!in_array($_SESSION['role'] ?? 'user', $roles, true)) {
+        jsonError('Forbidden', 403);
+    }
+}

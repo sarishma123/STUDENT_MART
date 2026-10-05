@@ -1,7 +1,6 @@
 
 -- On-Campus Mart Database
 -- BCA 4th Semester Project
--- Create this database in phpMyAdmin and run these queries
  
 CREATE DATABASE IF NOT EXISTS on_campus_mart;
 USE on_campus_mart;
@@ -13,6 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
   email VARCHAR(100) UNIQUE NOT NULL,
   password VARCHAR(255) NOT NULL,
   session_version INT NOT NULL DEFAULT 1,
+  role ENUM('user', 'admin') NOT NULL DEFAULT 'user',
   campus VARCHAR(100),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
