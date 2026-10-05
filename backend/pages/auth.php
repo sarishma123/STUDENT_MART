@@ -27,6 +27,13 @@ if (!is_array($input)) {
 if ($action === 'POST') {
     if (isLoggedIn() && !empty($input['logout'])) {
         $_SESSION = [];
+        setcookie(session_name(), '', [
+            'expires' => time() - 42000,
+            'path' => '/',
+            'secure' => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+            'httponly' => true,
+            'samesite' => 'Lax',
+        ]);
         session_destroy();
         jsonResponse(['success' => true, 'message' => 'Logged out']);
     }
@@ -56,6 +63,7 @@ if ($action === 'POST') {
             jsonError('Invalid email or password', 401);
         }
 
+        session_regenerate_id(true);
         $_SESSION['user_id'] = $user['user_id'];
         $_SESSION['user_name'] = $user['full_name'];
         $_SESSION['user_email'] = $user['email'];
@@ -123,6 +131,7 @@ if ($action === 'POST') {
 
         if ($stmt->execute()) {
             $userId = $stmt->insert_id;
+            session_regenerate_id(true);
             $_SESSION['user_id'] = $userId;
             $_SESSION['user_name'] = $name;
             $_SESSION['user_email'] = $email;
