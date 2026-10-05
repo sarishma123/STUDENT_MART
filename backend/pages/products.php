@@ -162,6 +162,7 @@ if ($method === 'PUT') {
     [$title, $categoryId, $description, $price, $condition, $image, $status] = validateProductInput($input, true);
     if (!categoryExists($conn, $categoryId)) {
         jsonError('Invalid category.', 422);
+    }
 
     $stmt = $conn->prepare("UPDATE products SET title = ?, category_id = ?, description = ?, price = ?, `condition` = ?, image = ?, status = ?
                             WHERE product_id = ? AND user_id = ?");
