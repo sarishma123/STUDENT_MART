@@ -52,6 +52,31 @@ if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'HEAD'], true)) {
 /* ---------- Database ---------- */
 require_once __DIR__ . "/../config/db.php";
 
+if (isset($_SESSION['user_id'])) {
+    $columnCheck = $conn->query("SELECT COUNT(*) AS column_exists
+        FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME = 'users'
+          AND COLUMN_NAME = 'session_version'");
+    $hasSessionVersion = (int)$columnCheck->fetch_assoc()['column_exists'] > 0;
+
+    if ($hasSessionVersion) {
+        $sessionCheck = $conn->prepare('SELECT session_version FROM users WHERE user_id = ?');
+        $sessionCheck->bind_param('i', $_SESSION['user_id']);
+        $sessionCheck->execute();
+        $sessionUser = $sessionCheck->get_result()->fetch_assoc();
+
+        if (!$sessionUser || (int)($_SESSION['session_version'] ?? 0) !== (int)$sessionUser['session_version']) {
+            $_SESSION = [];
+            session_regenerate_id(true);
+            $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+            $csrfToken = $_SESSION['csrf_token'];
+            setcookie('student_mart_csrf', $csrfToken, $csrfCookieOptions);
+            header("X-CSRF-Token: " . $csrfToken, true);
+        }
+    }
+}
+
 function jsonResponse($data) {
     echo json_encode($data);
     exit();

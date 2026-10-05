@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
   full_name VARCHAR(100) NOT NULL,
   email VARCHAR(100) UNIQUE NOT NULL,
   password VARCHAR(255) NOT NULL,
+  session_version INT NOT NULL DEFAULT 1,
   campus VARCHAR(100),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -25,6 +26,16 @@ CREATE TABLE IF NOT EXISTS password_resets (
   used_at DATETIME NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
+-- Rate-limit password reset requests by email address and IP address
+CREATE TABLE IF NOT EXISTS password_reset_attempts (
+  attempt_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  email_hash CHAR(64) NOT NULL,
+  ip_hash CHAR(64) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_reset_attempts_email_time (email_hash, created_at),
+  INDEX idx_reset_attempts_ip_time (ip_hash, created_at)
 );
  
 -- Categories Table

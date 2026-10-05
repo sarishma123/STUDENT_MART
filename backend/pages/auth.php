@@ -26,6 +26,24 @@ $conn->query("CREATE TABLE IF NOT EXISTS password_resets (
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 )");
 
+$sessionVersionColumn = $conn->query("SELECT COUNT(*) AS column_exists
+    FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'users'
+      AND COLUMN_NAME = 'session_version'");
+if ((int)$sessionVersionColumn->fetch_assoc()['column_exists'] === 0) {
+    $conn->query("ALTER TABLE users ADD COLUMN session_version INT NOT NULL DEFAULT 1 AFTER password");
+}
+
+$conn->query("CREATE TABLE IF NOT EXISTS password_reset_attempts (
+    attempt_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    email_hash CHAR(64) NOT NULL,
+    ip_hash CHAR(64) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_reset_attempts_email_time (email_hash, created_at),
+    INDEX idx_reset_attempts_ip_time (ip_hash, created_at)
+)");
+
 $action = $_SERVER['REQUEST_METHOD'];
 $input = json_decode(file_get_contents('php://input'), true);
 if (!is_array($input)) {
@@ -57,7 +75,7 @@ if ($action === 'POST') {
             jsonError('Email and password are required');
         }
 
-        $stmt = $conn->prepare("SELECT user_id, full_name, email, password FROM users WHERE email = ?");
+        $stmt = $conn->prepare("SELECT user_id, full_name, email, password, session_version FROM users WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -76,6 +94,7 @@ if ($action === 'POST') {
         $_SESSION['user_id'] = $user['user_id'];
         $_SESSION['user_name'] = $user['full_name'];
         $_SESSION['user_email'] = $user['email'];
+        $_SESSION['session_version'] = (int)$user['session_version'];
 
         jsonResponse([
             'success' => true,
@@ -144,6 +163,7 @@ if ($action === 'POST') {
             $_SESSION['user_id'] = $userId;
             $_SESSION['user_name'] = $name;
             $_SESSION['user_email'] = $email;
+            $_SESSION['session_version'] = 1;
 
             sendAppEmail(
                 $email,
@@ -170,6 +190,24 @@ if ($action === 'POST') {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             jsonError('Please enter a valid email address.');
         }
+
+        $emailHash = hash('sha256', $email);
+        $ipHash = hash('sha256', $_SERVER['REMOTE_ADDR'] ?? 'unknown');
+        $conn->query("DELETE FROM password_reset_attempts WHERE created_at < DATE_SUB(NOW(), INTERVAL 1 HOUR)");
+
+        $rateCheck = $conn->prepare("SELECT COUNT(*) AS attempts
+            FROM password_reset_attempts
+            WHERE created_at >= DATE_SUB(NOW(), INTERVAL 15 MINUTE)
+              AND (email_hash = ? OR ip_hash = ?)");
+        $rateCheck->bind_param('ss', $emailHash, $ipHash);
+        $rateCheck->execute();
+        if ((int)$rateCheck->get_result()->fetch_assoc()['attempts'] >= 5) {
+            jsonError('Too many password reset requests. Please try again later.', 429);
+        }
+
+        $rateInsert = $conn->prepare('INSERT INTO password_reset_attempts (email_hash, ip_hash) VALUES (?, ?)');
+        $rateInsert->bind_param('ss', $emailHash, $ipHash);
+        $rateInsert->execute();
 
         $stmt = $conn->prepare("SELECT user_id, full_name, email FROM users WHERE email = ?");
         $stmt->bind_param("s", $email);
@@ -225,7 +263,7 @@ if ($action === 'POST') {
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
         $conn->begin_transaction();
         try {
-            $updateUser = $conn->prepare("UPDATE users SET password = ? WHERE user_id = ?");
+            $updateUser = $conn->prepare("UPDATE users SET password = ?, session_version = session_version + 1 WHERE user_id = ?");
             $updateUser->bind_param("si", $hashedPassword, $reset['user_id']);
             $updateUser->execute();
 
