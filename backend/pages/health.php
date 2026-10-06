@@ -1,9 +1,8 @@
 <?php
-// api/health.php
-// Basic health check for PHP runtime, DB connectivity, and session state.
+// Basic health check for API availability and database connectivity.
 
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
 require_once __DIR__ . '/../includes/header.php';
 
 header("Content-Type: application/json");
@@ -13,25 +12,19 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 }
 
 $dbOk = false;
-$stmt = $conn->prepare('SELECT 1 as ok');
-if ($stmt && $stmt->execute()) {
-    $row = $stmt->get_result()->fetch_assoc();
-    $dbOk = isset($row['ok']) && (int)$row['ok'] === 1;
+try {
+    $stmt = $conn->prepare('SELECT 1');
+    $dbOk = $stmt !== false && $stmt->execute();
+} catch (Throwable $e) {
+    error_log('Health check database probe failed: ' . $e->getMessage());
+}
+
+if (!$dbOk) {
+    jsonError('Service unavailable', 503);
 }
 
 jsonResponse([
     'success' => true,
-    'service' => 'student_mart_api',
-    'php_version' => PHP_VERSION,
-    'database' => [
-        'connected' => $dbOk,
-        'name' => 'on_campus_mart'
-    ],
-    'session' => [
-        'active' => session_status() === PHP_SESSION_ACTIVE,
-        'logged_in' => isLoggedIn(),
-        'user_id' => isLoggedIn() ? (int)$_SESSION['user_id'] : null
-    ],
-    'timestamp' => date('c')
+    'status' => 'healthy'
 ]);
 ?>
