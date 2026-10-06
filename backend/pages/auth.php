@@ -96,13 +96,15 @@ if ($action === 'POST') {
         $ipHash = hash('sha256', $_SERVER['REMOTE_ADDR'] ?? 'unknown');
         $conn->query("DELETE FROM login_attempts WHERE created_at < DATE_SUB(NOW(), INTERVAL 15 MINUTE)");
 
-        $rateCheck = $conn->prepare("SELECT COUNT(*) AS attempts
+        $rateCheck = $conn->prepare("SELECT
+                SUM(email_hash = ?) AS email_attempts,
+                SUM(ip_hash = ?) AS ip_attempts
             FROM login_attempts
-            WHERE created_at >= DATE_SUB(NOW(), INTERVAL 15 MINUTE)
-              AND (email_hash = ? OR ip_hash = ?)");
+            WHERE created_at >= DATE_SUB(NOW(), INTERVAL 15 MINUTE)");
         $rateCheck->bind_param('ss', $emailHash, $ipHash);
         $rateCheck->execute();
-        if ((int)$rateCheck->get_result()->fetch_assoc()['attempts'] >= 5) {
+        $rateCounts = $rateCheck->get_result()->fetch_assoc();
+        if ((int)$rateCounts['email_attempts'] >= 5 || (int)$rateCounts['ip_attempts'] >= 20) {
             jsonError('Too many login attempts. Please try again later.', 429);
         }
 
