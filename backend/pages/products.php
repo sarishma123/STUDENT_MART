@@ -24,7 +24,7 @@ function validateProductInput(array $input, bool $allowStatus = false): array {
     if ($title === '' || strlen($title) > 150 || $description === '' || strlen($description) > 5000
         || $condition === '' || strlen($condition) > 20 || $categoryId === false || $categoryId < 1
         || !is_numeric($price) || !is_finite((float)$price) || (float)$price <= 0 || (float)$price > 99999999.99
-        || ($image !== null && strlen($image) > 255)) {
+        || ($image !== null && (strlen($image) > 255 || preg_match('/[\\\/]/', $image)))) {
         jsonError('Invalid product fields.', 422);
     }
 
@@ -215,8 +215,15 @@ if ($method === 'DELETE') {
 
     if ($stmt->execute()) {
         if (!empty($product['image'])) {
-            $imagePath = __DIR__ . '/uploads/' . $product['image'];
-            if (file_exists($imagePath)) {
+            $uploadDirectory = realpath(__DIR__ . '/uploads');
+            $imagePath = $uploadDirectory === false
+                ? false
+                : realpath($uploadDirectory . DIRECTORY_SEPARATOR . $product['image']);
+            $isUploadFile = $uploadDirectory !== false
+                && $imagePath !== false
+                && str_starts_with($imagePath, $uploadDirectory . DIRECTORY_SEPARATOR)
+                && is_file($imagePath);
+            if ($isUploadFile) {
                 unlink($imagePath);
             }
         }
