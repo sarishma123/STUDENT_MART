@@ -37,6 +37,16 @@ CREATE TABLE IF NOT EXISTS password_reset_attempts (
   INDEX idx_reset_attempts_email_time (email_hash, created_at),
   INDEX idx_reset_attempts_ip_time (ip_hash, created_at)
 );
+
+-- Rate-limit failed login attempts by email address and IP address
+CREATE TABLE IF NOT EXISTS login_attempts (
+  attempt_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  email_hash CHAR(64) NOT NULL,
+  ip_hash CHAR(64) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_login_attempts_email_time (email_hash, created_at),
+  INDEX idx_login_attempts_ip_time (ip_hash, created_at)
+);
  
 -- Categories Table
 CREATE TABLE IF NOT EXISTS categories (

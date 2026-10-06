@@ -52,6 +52,15 @@ $conn->query("CREATE TABLE IF NOT EXISTS password_reset_attempts (
     INDEX idx_reset_attempts_ip_time (ip_hash, created_at)
 )");
 
+$conn->query("CREATE TABLE IF NOT EXISTS login_attempts (
+    attempt_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    email_hash CHAR(64) NOT NULL,
+    ip_hash CHAR(64) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_login_attempts_email_time (email_hash, created_at),
+    INDEX idx_login_attempts_ip_time (ip_hash, created_at)
+)");
+
 $action = $_SERVER['REQUEST_METHOD'];
 $input = json_decode(file_get_contents('php://input'), true);
 if (!is_array($input)) {
@@ -83,20 +92,46 @@ if ($action === 'POST') {
             jsonError('Email and password are required');
         }
 
+        $emailHash = hash('sha256', strtolower($email));
+        $ipHash = hash('sha256', $_SERVER['REMOTE_ADDR'] ?? 'unknown');
+        $conn->query("DELETE FROM login_attempts WHERE created_at < DATE_SUB(NOW(), INTERVAL 15 MINUTE)");
+
+        $rateCheck = $conn->prepare("SELECT COUNT(*) AS attempts
+            FROM login_attempts
+            WHERE created_at >= DATE_SUB(NOW(), INTERVAL 15 MINUTE)
+              AND (email_hash = ? OR ip_hash = ?)");
+        $rateCheck->bind_param('ss', $emailHash, $ipHash);
+        $rateCheck->execute();
+        if ((int)$rateCheck->get_result()->fetch_assoc()['attempts'] >= 5) {
+            jsonError('Too many login attempts. Please try again later.', 429);
+        }
+
+        $recordLoginFailure = static function () use ($conn, $emailHash, $ipHash): void {
+            $rateInsert = $conn->prepare('INSERT INTO login_attempts (email_hash, ip_hash) VALUES (?, ?)');
+            $rateInsert->bind_param('ss', $emailHash, $ipHash);
+            $rateInsert->execute();
+        };
+
         $stmt = $conn->prepare("SELECT user_id, full_name, email, password, session_version, role FROM users WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
         $result = $stmt->get_result();
 
         if ($result->num_rows === 0) {
+            $recordLoginFailure();
             jsonError('Invalid email or password', 401);
         }
 
         $user = $result->fetch_assoc();
 
         if (!password_verify($password, $user['password'])) {
+            $recordLoginFailure();
             jsonError('Invalid email or password', 401);
         }
+
+        $clearLoginAttempts = $conn->prepare('DELETE FROM login_attempts WHERE email_hash = ?');
+        $clearLoginAttempts->bind_param('s', $emailHash);
+        $clearLoginAttempts->execute();
 
         session_regenerate_id(true);
         $_SESSION['user_id'] = $user['user_id'];
