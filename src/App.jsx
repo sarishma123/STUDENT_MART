@@ -68,7 +68,6 @@ export default function App() {
     condition: p.condition || 'Good',
     image: p.image || null,
     posted: p.created_at ? new Date(p.created_at).toLocaleDateString() : 'Recently',
-    contact: p.email || '',
     ownerId: Number(p.user_id) || 0,
     isSold: p.status === 'sold',
     description: p.description || '',

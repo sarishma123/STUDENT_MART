@@ -58,24 +58,8 @@ export default function ProductDetailPage({
           <div className="detail-seller-card">
             <p className="detail-meta-label"> Contact</p>
             <p className="detail-contact-value">
-              {product.contact}
+              Seller contact details are shared after a purchase.
             </p>
-            <button
-              onClick={async () => {
-                if (!product.contact) return;
-
-                try {
-                  await navigator.clipboard.writeText(product.contact);
-                  alert('Seller email copied to your clipboard.');
-                } catch {
-                  alert(`Contact the seller at ${product.contact}`);
-                }
-              }}
-              className="btn btn-primary btn-block"
-              disabled={!product.contact}
-            >
-              Contact Seller
-            </button>
           </div>
 
           {!isLoggedIn && (

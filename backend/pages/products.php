@@ -65,7 +65,7 @@ if ($method === 'GET') {
     $id = positiveInteger($_GET['id'] ?? null);
     
     if ($id > 0) {
-        $stmt = $conn->prepare("SELECT p.*, u.full_name, u.email, u.campus, c.category_name 
+        $stmt = $conn->prepare("SELECT p.*, u.full_name, u.campus, c.category_name 
                                 FROM products p
                                 JOIN users u ON p.user_id = u.user_id
                                 JOIN categories c ON p.category_id = c.category_id
@@ -88,7 +88,6 @@ if ($method === 'GET') {
             'status' => $product['status'],
             'created_at' => $product['created_at'],
             'full_name' => $product['full_name'],
-            'email' => $product['email'],
             'campus' => $product['campus'],
             'category_name' => $product['category_name'],
             'user_id' => (int)$product['user_id']

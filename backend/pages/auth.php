@@ -7,11 +7,33 @@ require_once __DIR__ . "/../includes/header.php";
 require_once __DIR__ . "/../includes/mailer.php";
 
 function isStrongPassword(string $password): bool {
-    return strlen($password) >= 9
+    return strlen($password) >= 9 && strlen($password) <= 128
         && preg_match('/[A-Z]/', $password)
         && preg_match('/[a-z]/', $password)
         && preg_match('/[0-9]/', $password)
         && preg_match('/[^A-Za-z0-9]/', $password);
+}
+
+function normalizeEmail(mixed $value): string {
+    if (!is_string($value)) {
+        return '';
+    }
+
+    $email = strtolower(trim($value));
+    return filter_var($email, FILTER_VALIDATE_EMAIL) && strlen($email) <= 100 ? $email : '';
+}
+
+function validateDisplayName(mixed $value): string {
+    if (!is_string($value)) {
+        return '';
+    }
+
+    $name = trim($value);
+    return strlen($name) >= 2
+        && strlen($name) <= 100
+        && preg_match("/^[\p{L}\p{M}][\p{L}\p{M} .'-]*$/u", $name)
+        ? $name
+        : '';
 }
 
 // Keeps existing installations compatible; the same statement is also in db.sql.
@@ -85,11 +107,11 @@ if ($action === 'POST') {
     $type = isset($input['type']) ? sanitize($input['type']) : (isset($_GET['type']) ? sanitize($_GET['type']) : '');
 
     if ($type === 'login') {
-        $email = isset($input['email']) ? sanitize($input['email']) : '';
-        $password = isset($input['password']) ? $input['password'] : '';
+        $email = normalizeEmail($input['email'] ?? null);
+        $password = is_string($input['password'] ?? null) ? $input['password'] : '';
 
-        if (empty($email) || empty($password)) {
-            jsonError('Email and password are required');
+        if ($email === '' || $password === '' || strlen($password) > 128) {
+            jsonError('Invalid email or password.', 422);
         }
 
         $emailHash = hash('sha256', strtolower($email));
@@ -180,12 +202,12 @@ if ($action === 'POST') {
         jsonResponse(['success' => true, 'message' => 'Password changed successfully.']);
 
     } elseif ($type === 'register') {
-        $name = isset($input['name']) ? sanitize($input['name']) : '';
-        $email = isset($input['email']) ? sanitize($input['email']) : '';
-        $password = isset($input['password']) ? $input['password'] : '';
+        $name = validateDisplayName($input['name'] ?? null);
+        $email = normalizeEmail($input['email'] ?? null);
+        $password = is_string($input['password'] ?? null) ? $input['password'] : '';
 
-        if (empty($name) || empty($email) || empty($password)) {
-            jsonError('All fields are required');
+        if ($name === '' || $email === '' || $password === '') {
+            jsonError('Please provide a valid name, email, and password.', 422);
         }
 
         if (!isStrongPassword($password)) {
