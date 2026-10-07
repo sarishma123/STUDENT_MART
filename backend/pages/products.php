@@ -21,8 +21,10 @@ function validateProductInput(array $input, bool $allowStatus = false): array {
     $categoryId = filter_var($input['category_id'] ?? null, FILTER_VALIDATE_INT);
     $price = $input['price'] ?? null;
 
-    if ($title === '' || strlen($title) > 150 || $description === '' || strlen($description) > 5000
-        || $condition === '' || strlen($condition) > 20 || $categoryId === false || $categoryId < 1
+    if ($title === '' || strlen($title) > 150 || preg_match('/[\x00-\x1F\x7F]/', $title)
+        || $description === '' || strlen($description) > 5000 || preg_match('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', $description)
+        || $condition === '' || strlen($condition) > 20 || preg_match('/[\x00-\x1F\x7F]/', $condition)
+        || $categoryId === false || $categoryId < 1
         || !is_numeric($price) || !is_finite((float)$price) || (float)$price <= 0 || (float)$price > 99999999.99
         || ($image !== null && (strlen($image) > 255 || preg_match('/[\\\/]/', $image)))) {
         jsonError('Invalid product fields.', 422);

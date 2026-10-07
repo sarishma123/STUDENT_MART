@@ -104,7 +104,8 @@ if ($action === 'POST') {
         jsonResponse(['success' => true, 'message' => 'Logged out']);
     }
 
-    $type = isset($input['type']) ? sanitize($input['type']) : (isset($_GET['type']) ? sanitize($_GET['type']) : '');
+    $typeValue = $input['type'] ?? $_GET['type'] ?? '';
+    $type = is_string($typeValue) ? trim($typeValue) : '';
 
     if ($type === 'login') {
         $email = normalizeEmail($input['email'] ?? null);
@@ -178,8 +179,8 @@ if ($action === 'POST') {
             jsonError('Authentication required', 401);
         }
 
-        $currentPassword = isset($input['current_password']) ? $input['current_password'] : '';
-        $newPassword = isset($input['new_password']) ? $input['new_password'] : '';
+        $currentPassword = is_string($input['current_password'] ?? null) ? $input['current_password'] : '';
+        $newPassword = is_string($input['new_password'] ?? null) ? $input['new_password'] : '';
 
         if (empty($currentPassword) || !isStrongPassword($newPassword)) {
             jsonError('New password must be at least 9 characters and include uppercase, lowercase, a number, and a symbol.');
@@ -255,7 +256,7 @@ if ($action === 'POST') {
         }
 
     } elseif ($type === 'forgot-password') {
-        $email = isset($input['email']) ? strtolower(trim($input['email'])) : '';
+        $email = normalizeEmail($input['email'] ?? null);
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             jsonError('Please enter a valid email address.');
         }
@@ -312,8 +313,8 @@ if ($action === 'POST') {
         jsonResponse(['success' => true, 'message' => 'If that email is registered, a password reset link has been sent.']);
 
     } elseif ($type === 'reset-password') {
-        $token = isset($input['token']) ? trim($input['token']) : '';
-        $password = isset($input['password']) ? $input['password'] : '';
+        $token = is_string($input['token'] ?? null) ? trim($input['token']) : '';
+        $password = is_string($input['password'] ?? null) ? $input['password'] : '';
 
         if (!preg_match('/^[a-f0-9]{64}$/', $token) || !isStrongPassword($password)) {
             jsonError('A valid reset token and a password of at least 9 characters with uppercase, lowercase, a number, and a symbol are required.');
