@@ -4,6 +4,8 @@ ini_set('display_errors', '0');
 ini_set('display_startup_errors', '0');
 ini_set('log_errors', '1');
 
+require_once __DIR__ . '/functions.php';
+
 $isHttps = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
 ini_set('session.use_strict_mode', '1');
 ini_set('session.use_only_cookies', '1');
@@ -79,37 +81,5 @@ if (isset($_SESSION['user_id'])) {
             setcookie('student_mart_csrf', $csrfToken, $csrfCookieOptions);
             header("X-CSRF-Token: " . $csrfToken, true);
         }
-    }
-}
-
-function jsonResponse($data) {
-    echo json_encode($data);
-    exit();
-}
-
-function jsonError($message, $code = 400) {
-    http_response_code($code);
-    echo json_encode([
-        "success" => false,
-        "message" => $message
-    ]);
-    exit();
-}
-
-function sanitize($value) {
-    return htmlspecialchars(trim($value), ENT_QUOTES, "UTF-8");
-}
-
-function isLoggedIn() {
-    return isset($_SESSION["user_id"]);
-}
-
-function requireRole(string ...$roles): void {
-    if (!isLoggedIn()) {
-        jsonError('Authentication required', 401);
-    }
-
-    if (!in_array($_SESSION['role'] ?? 'user', $roles, true)) {
-        jsonError('Forbidden', 403);
     }
 }

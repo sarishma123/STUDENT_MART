@@ -22,6 +22,17 @@ function isLoggedIn(): bool
     return isset($_SESSION['user_id']);
 }
 
+function requireRole(string ...$roles): void
+{
+    if (!isLoggedIn()) {
+        jsonError('Authentication required', 401);
+    }
+
+    if (!in_array($_SESSION['role'] ?? 'user', $roles, true)) {
+        jsonError('Forbidden', 403);
+    }
+}
+
 function getUserInfo(int $userId, mysqli $conn): ?array
 {
     $stmt = $conn->prepare('SELECT user_id, full_name, email, campus, created_at FROM users WHERE user_id = ?');
