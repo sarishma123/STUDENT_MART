@@ -16,7 +16,7 @@ within the collage phriphery
 - Remove Product
 
 
-## 🚧 In Progress / Upcoming
+##  In Progress / Upcoming
 
 - Filters (category, price, etc.)
 - Profile page
