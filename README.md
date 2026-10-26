@@ -22,7 +22,7 @@ within the collage phriphery
 - Profile page
 - Backend integration
 
-## 🛠️ Technologies Used
+##  Technologies Used
 
 - React
 - JavaScript (JSX)
