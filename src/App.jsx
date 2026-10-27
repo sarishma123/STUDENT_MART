@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import './App.css';
 
 import Header from './component/header';
@@ -232,11 +232,11 @@ export default function App() {
     }
   };
 
-  const handleLoadAdminDashboard = async () => api.getAdminDashboard();
+  const handleLoadAdminDashboard = useCallback(() => api.getAdminDashboard(), []);
 
-  const handleDeleteAdminProduct = async (productId) => {
+  const handleDeleteAdminProduct = useCallback(async (productId) => {
     await api.deleteAdminProduct(productId);
-  };
+  }, []);
 
   const handleLogout = async () => {
     try {

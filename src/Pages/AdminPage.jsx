@@ -1,24 +1,24 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ShieldCheck, Trash2 } from 'lucide-react';
 
 export default function AdminPage({ onLoad, onDeleteProduct, onBack }) {
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
 
-  const loadDashboard = async () => {
+  const loadDashboard = useCallback(async () => {
     try {
       setError('');
       setData(await onLoad());
     } catch (loadError) {
       setError(loadError.message || 'Could not load the admin dashboard.');
     }
-  };
+  }, [onLoad]);
 
   useEffect(() => {
     loadDashboard();
-  }, []);
+  }, [loadDashboard]);
 
-  const handleDelete = async (productId) => {
+  const handleDelete = useCallback(async (productId) => {
     if (!window.confirm('Remove this product from the marketplace?')) return;
 
     try {
@@ -27,7 +27,7 @@ export default function AdminPage({ onLoad, onDeleteProduct, onBack }) {
     } catch (deleteError) {
       setError(deleteError.message || 'Could not remove the product.');
     }
-  };
+  }, [loadDashboard, onDeleteProduct]);
 
   if (!data) {
     return <main className="page"><p>{error || 'Loading admin dashboard...'}</p></main>;
