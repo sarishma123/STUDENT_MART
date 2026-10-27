@@ -16,13 +16,13 @@ within the collage phriphery
 - Remove Product
 
 
-## 🚧 In Progress / Upcoming
+##  In Progress / Upcoming
 
 - Filters (category, price, etc.)
 - Profile page
 - Backend integration
 
-## 🛠️ Technologies Used
+##  Technologies Used
 
 - React
 - JavaScript (JSX)
@@ -49,7 +49,7 @@ Registration sends a welcome email, and the login page sends a six-digit passwor
 2. Configure XAMPP's `sendmail.ini` with the provider's SMTP username, password, host, and port. Gmail requires an App Password, not your normal password.
 3. Restart Apache after changing these files.
 4. Set `STUDENT_MART_MAIL_FROM` to an address accepted by your SMTP provider.
-5. Set `STUDENT_MART_APP_URL` to the frontend URL. For local Vite development, use `http://localhost:5173`.
+5. Set `STUDENT_MART_APP_URL` to the frontend URL. For local Vite development, use `http://localhost:5174`.
 
 The `password_resets` table is included in `backend/databse/db.sql`. The auth endpoint also creates it automatically for existing installations and adds the OTP attempt counter to older installations.
 
