@@ -30,6 +30,11 @@ export default function Header({
         </button>
         {isLoggedIn && (
           <>
+            {currentUser?.role === 'admin' && (
+              <button onClick={() => setCurrentPage('admin')} className="site-nav__link">
+                Admin
+              </button>
+            )}
             <button onClick={() => setCurrentPage('dashboard')} className="site-nav__link">
               Dashboard
             </button>

@@ -17,6 +17,7 @@ import DashboardPage from './Pages/Dashboard';
 import ProfilePage from './Pages/profile';
 import ChangePasswordPage from './Pages/ChangePasswordPage';
 import StartupCheckPage from './Pages/StartupCheck';
+import AdminPage from './Pages/AdminPage';
 
 const categoryIds = {
   Textbooks: 1,
@@ -121,6 +122,7 @@ export default function App() {
       id: data.user.id,
       email: data.user.email,
       name: data.user.name,
+      role: data.user.role,
       profileImage: "👤",
       joinDate: "Member",
     });
@@ -170,6 +172,7 @@ export default function App() {
         id: data.user.id,
         email: data.user.email,
         name: data.user.name,
+        role: data.user.role,
         profileImage: '👤',
         joinDate: 'Member',
       });
@@ -189,6 +192,7 @@ export default function App() {
         id: data.user.id,
         email: data.user.email,
         name: data.user.name,
+        role: data.user.role,
         profileImage: '👤',
         joinDate: 'Today',
       });
@@ -226,6 +230,12 @@ export default function App() {
     } catch (error) {
       return { success: false, error: error.message };
     }
+  };
+
+  const handleLoadAdminDashboard = async () => api.getAdminDashboard();
+
+  const handleDeleteAdminProduct = async (productId) => {
+    await api.deleteAdminProduct(productId);
   };
 
   const handleLogout = async () => {
@@ -441,6 +451,15 @@ export default function App() {
             userProductCount={userProducts.length}
           />
         );
+
+      case 'admin':
+        return currentUser?.role === 'admin' ? (
+          <AdminPage
+            onLoad={handleLoadAdminDashboard}
+            onDeleteProduct={handleDeleteAdminProduct}
+            onBack={() => setCurrentPage('home')}
+          />
+        ) : renderHome();
 
       case 'change-password':
         return (

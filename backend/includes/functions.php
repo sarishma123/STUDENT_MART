@@ -35,7 +35,7 @@ function requireRole(string ...$roles): void
 
 function getUserInfo(int $userId, mysqli $conn): ?array
 {
-    $stmt = $conn->prepare('SELECT user_id, full_name, email, campus, created_at FROM users WHERE user_id = ?');
+    $stmt = $conn->prepare('SELECT user_id, full_name, email, campus, role, created_at FROM users WHERE user_id = ?');
     $stmt->bind_param('i', $userId);
     $stmt->execute();
     $user = $stmt->get_result()->fetch_assoc();

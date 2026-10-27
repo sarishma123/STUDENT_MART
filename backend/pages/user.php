@@ -30,6 +30,7 @@ jsonResponse([
     'id' => (int)$user['user_id'],
     'name' => $user['full_name'],
     'email' => $user['email'],
+    'role' => $user['role'],
     'campus' => $user['campus'] ?? '',
     'joinDate' => date('M Y', strtotime($user['created_at'])),
     'totalProducts' => (int)$totalProducts,

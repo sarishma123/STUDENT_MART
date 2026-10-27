@@ -74,6 +74,8 @@ export const api = {
     }),
   logout: () => jsonRequest('/auth.php', { logout: true }),
   getCurrentUser: () => apiRequest('/auth.php'),
+  getAdminDashboard: () => apiRequest('/admin.php'),
+  deleteAdminProduct: (productId) => jsonRequest('/admin.php', { product_id: productId }, 'DELETE'),
   getProducts: () => apiRequest('/browse.php'),
   getUserProducts: (userId) => apiRequest(`/products.php?user_id=${encodeURIComponent(userId)}`),
   getProduct: (productId) => apiRequest(`/products.php?id=${encodeURIComponent(productId)}`),

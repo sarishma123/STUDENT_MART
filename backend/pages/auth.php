@@ -179,7 +179,8 @@ if ($action === 'POST') {
             'user' => [
                 'id' => (int)$user['user_id'],
                 'name' => $user['full_name'],
-                'email' => $user['email']
+                'email' => $user['email'],
+                'role' => $user['role']
             ]
         ]);
 
@@ -257,7 +258,8 @@ if ($action === 'POST') {
                 'user' => [
                     'id' => $userId,
                     'name' => $name,
-                    'email' => $email
+                    'email' => $email,
+                    'role' => 'user'
                 ]
             ]);
         } else {
@@ -378,7 +380,8 @@ if ($action === 'GET' && isLoggedIn()) {
         'user' => [
             'id' => $_SESSION['user_id'],
             'name' => $_SESSION['user_name'],
-            'email' => $_SESSION['user_email']
+            'email' => $_SESSION['user_email'],
+            'role' => $_SESSION['role'] ?? 'user'
         ]
     ]);
 }
