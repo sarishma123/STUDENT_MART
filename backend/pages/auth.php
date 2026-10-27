@@ -43,9 +43,18 @@ $conn->query("CREATE TABLE IF NOT EXISTS password_resets (
     token_hash CHAR(64) NOT NULL UNIQUE,
     expires_at DATETIME NOT NULL,
     used_at DATETIME NULL,
+    failed_attempts TINYINT UNSIGNED NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 )");
+$resetAttemptsColumn = $conn->query("SELECT COUNT(*) AS column_exists
+    FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'password_resets'
+      AND COLUMN_NAME = 'failed_attempts'");
+if ((int)$resetAttemptsColumn->fetch_assoc()['column_exists'] === 0) {
+    $conn->query("ALTER TABLE password_resets ADD COLUMN failed_attempts TINYINT UNSIGNED NOT NULL DEFAULT 0 AFTER used_at");
+}
 
 $sessionVersionColumn = $conn->query("SELECT COUNT(*) AS column_exists
     FROM information_schema.COLUMNS
@@ -286,48 +295,59 @@ if ($action === 'POST') {
 
         // Keep this response identical for known and unknown addresses.
         if ($user) {
-            $token = bin2hex(random_bytes(32));
-            $tokenHash = hash('sha256', $token);
-            $expiresAt = date('Y-m-d H:i:s', time() + 3600);
+            $otp = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+            $otpHash = hash('sha256', $otp);
+            $expiresAt = date('Y-m-d H:i:s', time() + 600);
 
             $delete = $conn->prepare("DELETE FROM password_resets WHERE user_id = ? OR expires_at < NOW()");
             $delete->bind_param("i", $user['user_id']);
             $delete->execute();
 
             $insert = $conn->prepare("INSERT INTO password_resets (user_id, token_hash, expires_at) VALUES (?, ?, ?)");
-            $insert->bind_param("iss", $user['user_id'], $tokenHash, $expiresAt);
+            $insert->bind_param("iss", $user['user_id'], $otpHash, $expiresAt);
             $insert->execute();
 
-            $resetUrl = appUrl('/?reset=' . urlencode($token));
             sendAppEmail(
                 $user['email'],
-                'Reset your StudentMart password',
+                'Your StudentMart password reset code',
                 '<h2>Password reset request</h2>' .
                 '<p>Hello ' . htmlspecialchars($user['full_name'], ENT_QUOTES, 'UTF-8') . ',</p>' .
-                '<p>Use the link below within one hour to choose a new password:</p>' .
-                '<p><a href="' . htmlspecialchars($resetUrl, ENT_QUOTES, 'UTF-8') . '">Reset my password</a></p>' .
+                '<p>Your password reset code is:</p>' .
+                '<p style="font-size: 28px; font-weight: bold; letter-spacing: 8px;">' . $otp . '</p>' .
+                '<p>This code expires in 10 minutes and can be used once.</p>' .
                 '<p>If you did not request this, you can safely ignore this email.</p>'
             );
         }
 
-        jsonResponse(['success' => true, 'message' => 'If that email is registered, a password reset link has been sent.']);
+        jsonResponse(['success' => true, 'message' => 'If that email is registered, a password reset code has been sent.']);
 
     } elseif ($type === 'reset-password') {
-        $token = is_string($input['token'] ?? null) ? trim($input['token']) : '';
+        $email = normalizeEmail($input['email'] ?? null);
+        $otp = is_string($input['otp'] ?? null) ? trim($input['otp']) : '';
         $password = is_string($input['password'] ?? null) ? $input['password'] : '';
 
-        if (!preg_match('/^[a-f0-9]{64}$/', $token) || !isStrongPassword($password)) {
-            jsonError('A valid reset token and a password of at least 9 characters with uppercase, lowercase, a number, and a symbol are required.');
+        if ($email === '' || !preg_match('/^\d{6}$/', $otp) || !isStrongPassword($password)) {
+            jsonError('A valid six-digit code and a password of at least 9 characters with uppercase, lowercase, a number, and a symbol are required.');
         }
 
-        $tokenHash = hash('sha256', $token);
-        $stmt = $conn->prepare("SELECT reset_id, user_id FROM password_resets WHERE token_hash = ? AND used_at IS NULL AND expires_at > NOW()");
-        $stmt->bind_param("s", $tokenHash);
+        $otpHash = hash('sha256', $otp);
+        $stmt = $conn->prepare("SELECT password_resets.reset_id, password_resets.user_id, password_resets.token_hash, password_resets.failed_attempts
+            FROM password_resets
+            INNER JOIN users ON users.user_id = password_resets.user_id
+            WHERE users.email = ? AND password_resets.used_at IS NULL AND password_resets.expires_at > NOW()
+            ORDER BY password_resets.created_at DESC
+            LIMIT 1");
+        $stmt->bind_param("s", $email);
         $stmt->execute();
         $reset = $stmt->get_result()->fetch_assoc();
 
-        if (!$reset) {
-            jsonError('This reset link is invalid or has expired.', 400);
+        if (!$reset || (int)$reset['failed_attempts'] >= 5 || !hash_equals($reset['token_hash'], $otpHash)) {
+            if ($reset && (int)$reset['failed_attempts'] < 5) {
+                $failedAttempt = $conn->prepare("UPDATE password_resets SET failed_attempts = failed_attempts + 1, used_at = IF(failed_attempts + 1 >= 5, NOW(), used_at) WHERE reset_id = ?");
+                $failedAttempt->bind_param("i", $reset['reset_id']);
+                $failedAttempt->execute();
+            }
+            jsonError('This code is invalid or has expired.', 400);
         }
 
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);

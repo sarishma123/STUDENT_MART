@@ -64,8 +64,8 @@ export const api = {
   register: (name, email, password) =>
     jsonRequest('/auth.php', { type: 'register', name, email, password }),
   forgotPassword: (email) => jsonRequest('/auth.php', { type: 'forgot-password', email }),
-  resetPassword: (token, password) =>
-    jsonRequest('/auth.php', { type: 'reset-password', token, password }),
+  resetPassword: (email, otp, password) =>
+    jsonRequest('/auth.php', { type: 'reset-password', email, otp, password }),
   changePassword: (currentPassword, newPassword) =>
     jsonRequest('/auth.php', {
       type: 'change-password',

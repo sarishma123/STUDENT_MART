@@ -43,7 +43,7 @@ within the collage phriphery
 
 ## Email and password recovery
 
-Registration sends a welcome email, and the login page includes a one-hour password reset link. The backend uses PHP's `mail()` function, so XAMPP must be connected to an SMTP relay before messages can be delivered.
+Registration sends a welcome email, and the login page sends a six-digit password reset code that expires after 10 minutes. The backend uses PHP's `mail()` function, so XAMPP must be connected to an SMTP relay before messages can be delivered.
 
 1. In `php.ini`, enable the mail settings and set the SMTP host and port for your provider.
 2. Configure XAMPP's `sendmail.ini` with the provider's SMTP username, password, host, and port. Gmail requires an App Password, not your normal password.
@@ -51,7 +51,7 @@ Registration sends a welcome email, and the login page includes a one-hour passw
 4. Set `STUDENT_MART_MAIL_FROM` to an address accepted by your SMTP provider.
 5. Set `STUDENT_MART_APP_URL` to the frontend URL. For local Vite development, use `http://localhost:5173`.
 
-The `password_resets` table is included in `backend/databse/db.sql`. The auth endpoint also creates it automatically for existing installations.
+The `password_resets` table is included in `backend/databse/db.sql`. The auth endpoint also creates it automatically for existing installations and adds the OTP attempt counter to older installations.
 
 ## 📌 Notes
 

@@ -16,7 +16,6 @@ export default function AuthPage({
   onForgotPassword,
   onResetPassword,
   initialMode = 'login',
-  resetToken = '',
 }) {
   const [mode, setMode] = useState(initialMode);
 
@@ -32,6 +31,7 @@ export default function AuthPage({
   const [forgotEmail, setForgotEmail] = useState('');
   const [forgotError, setForgotError] = useState('');
   const [forgotMessage, setForgotMessage] = useState('');
+  const [resetOtp, setResetOtp] = useState('');
   const [resetPassword, setResetPassword] = useState('');
   const [resetConfirm, setResetConfirm] = useState('');
   const [resetError, setResetError] = useState('');
@@ -115,6 +115,7 @@ export default function AuthPage({
     const result = await onForgotPassword(email);
     if (result.success) {
       setForgotMessage(result.message);
+      setMode('reset');
     } else {
       setForgotError(result.error || 'Could not send reset email.');
     }
@@ -124,8 +125,13 @@ export default function AuthPage({
     e.preventDefault();
     setResetError('');
 
+    const otp = resetOtp.trim();
     const password = sanitizeInput(resetPassword);
     const confirm = sanitizeInput(resetConfirm);
+    if (!/^\d{6}$/.test(otp)) {
+      setResetError('Please enter the six-digit code from your email.');
+      return;
+    }
     if (!isStrongPassword(password)) {
       setResetError(PASSWORD_REQUIREMENTS);
       return;
@@ -135,10 +141,11 @@ export default function AuthPage({
       return;
     }
 
-    const result = await onResetPassword(resetToken, password);
+    const result = await onResetPassword(forgotEmail, otp, password);
     if (result.success) {
       setLoginError(result.message || 'Password updated. You can now sign in.');
       setMode('login');
+      setResetOtp('');
       setResetPassword('');
       setResetConfirm('');
     } else {
@@ -309,21 +316,29 @@ export default function AuthPage({
 
         {mode === 'forgot' && (
           <form onSubmit={handleForgot} className="auth-form auth-form--standalone">
-            <p className="auth-helper">Enter your email and we will send you a one-hour password reset link.</p>
+            <p className="auth-helper">Enter your email and we will send you a six-digit password reset code.</p>
             <label className="field-group">
               Email
               <input type="email" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} className="field" required autoComplete="email" />
             </label>
             {forgotError && <p className="auth-error">{forgotError}</p>}
             {forgotMessage && <p className="auth-success">{forgotMessage}</p>}
-            <button type="submit" className="btn btn-primary btn-block"><Mail size={18} /> Send Reset Link</button>
+            <button type="submit" className="btn btn-primary btn-block"><Mail size={18} /> Send Code</button>
             <button type="button" className="auth-link" onClick={switchToLogin}><ArrowLeft size={15} /> Back to sign in</button>
           </form>
         )}
 
         {mode === 'reset' && (
           <form onSubmit={handleReset} className="auth-form auth-form--standalone">
-            <p className="auth-helper">Choose a new password for your StudentMart account.</p>
+            <p className="auth-helper">Enter the code sent to your email, then choose a new password.</p>
+            <label className="field-group">
+              Email
+              <input type="email" value={forgotEmail} onChange={(e) => setForgotEmail(e.target.value)} className="field" required autoComplete="email" />
+            </label>
+            <label className="field-group">
+              Verification Code
+              <input type="text" inputMode="numeric" pattern="\d{6}" maxLength={6} value={resetOtp} onChange={(e) => setResetOtp(e.target.value.replace(/\D/g, '').slice(0, 6))} className="field" required autoComplete="one-time-code" />
+            </label>
             <label className="field-group">
               New Password
               <input type="password" value={resetPassword} onChange={(e) => setResetPassword(e.target.value)} className="field" required minLength={9} autoComplete="new-password" />
