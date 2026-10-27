@@ -53,6 +53,20 @@ Registration sends a welcome email, and the login page sends a six-digit passwor
 
 The `password_resets` table is included in `backend/databse/db.sql`. The auth endpoint also creates it automatically for existing installations and adds the OTP attempt counter to older installations.
 
+## Admin access
+
+Admin authorization is enforced by the PHP API. The admin dashboard can view users and listings and remove a listing; normal users cannot call those endpoints successfully, even if they manually navigate to the admin page.
+
+After creating a normal account, promote it from MySQL using a prepared/admin console:
+
+```sql
+UPDATE users
+SET role = 'admin'
+WHERE email = 'your-admin-email@example.com';
+```
+
+Log out and sign in again after changing the role so the new role is loaded into the session. Do not expose a public “make me admin” form.
+
 ## 📌 Notes
 
 This project is under active development — backend and remaining pages will be added in upcoming stages.
