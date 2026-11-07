@@ -49,6 +49,7 @@ Registration sends a welcome email, and the login page sends a six-digit passwor
 
 The `password_resets` table is included in `backend/databse/db.sql`. The auth endpoint also creates it automatically for existing installations and adds the OTP attempt counter to older installations.
 
+
 ## Admin access
 
 Admin authorization is enforced by the PHP API. The admin dashboard can view users and listings and remove a listing; normal users cannot call those endpoints successfully, even if they manually navigate to the admin page.
