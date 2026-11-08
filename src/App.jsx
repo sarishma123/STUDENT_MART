@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import './App.css';
 
 import Header from './component/header';
@@ -43,11 +44,49 @@ function normalizeCategory(categoryName) {
   return 'Other';
 }
 
+function pageToPath(page) {
+  if (page === 'home') return '/';
+  if (page === 'browse') return '/browse';
+  if (page === 'auth' || page === 'login') return '/login';
+  if (page === 'register') return '/register';
+  if (page === 'add-product') return '/products/new';
+  if (page === 'dashboard') return '/dashboard';
+  if (page === 'profile') return '/profile';
+  if (page === 'change-password') return '/profile/password';
+  if (page === 'startup-check') return '/system-check';
+  if (page === 'admin') return '/admin';
+  if (page.startsWith('product-')) return `/products/${page.slice('product-'.length)}`;
+  if (page.startsWith('edit-')) return `/products/${page.slice('edit-'.length)}/edit`;
+  return '/';
+}
+
+function pathToPage(pathname) {
+  if (pathname === '/') return 'home';
+  if (pathname === '/browse') return 'browse';
+  if (pathname === '/login') return 'login';
+  if (pathname === '/register') return 'register';
+  if (pathname === '/products/new') return 'add-product';
+  if (pathname === '/dashboard') return 'dashboard';
+  if (pathname === '/profile') return 'profile';
+  if (pathname === '/profile/password') return 'change-password';
+  if (pathname === '/system-check') return 'startup-check';
+  if (pathname === '/admin') return 'admin';
+
+  const editMatch = pathname.match(/^\/products\/(\d+)\/edit$/);
+  if (editMatch) return `edit-${editMatch[1]}`;
+
+  const productMatch = pathname.match(/^\/products\/(\d+)$/);
+  if (productMatch) return `product-${productMatch[1]}`;
+
+  return 'not-found';
+}
+
 export default function App() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
-  const [currentPage, setCurrentPage] = useState('home');
-  const [postAuthRedirect, setPostAuthRedirect] = useState('home');
+  const [postAuthRedirect, setPostAuthRedirect] = useState('/');
 
   const [products, setProducts] = useState([]);
   const [userProducts, setUserProducts] = useState([]);
@@ -58,6 +97,8 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const currentPage = pathToPage(location.pathname);
+  const setCurrentPage = (page) => navigate(pageToPath(page));
 
   const mapApiProduct = (p) => ({
     id: Number(p.product_id),
@@ -176,8 +217,8 @@ export default function App() {
   }, [searchQuery, selectedCategory, products]);
 
   const openAuth = (mode = 'login', redirectPage = 'home') => {
-    setPostAuthRedirect(redirectPage);
-    setCurrentPage(mode === 'register' ? 'register' : 'auth');
+    setPostAuthRedirect(pageToPath(redirectPage));
+    navigate(mode === 'register' ? '/register' : '/login');
   };
 
   const handleLogin = async (email, password) => {
@@ -192,8 +233,8 @@ export default function App() {
         joinDate: 'Member',
       });
       setIsLoggedIn(true);
-      setCurrentPage(postAuthRedirect);
-      setPostAuthRedirect('home');
+      navigate(location.state?.from || postAuthRedirect, { replace: true });
+      setPostAuthRedirect('/');
       return { success: true };
     } catch (error) {
       return { success: false, error: error.message };
@@ -212,8 +253,8 @@ export default function App() {
         joinDate: 'Today',
       });
       setIsLoggedIn(true);
-      setCurrentPage(postAuthRedirect);
-      setPostAuthRedirect('home');
+      navigate(location.state?.from || postAuthRedirect, { replace: true });
+      setPostAuthRedirect('/');
       return { success: true };
     } catch (error) {
       return { success: false, error: error.message };
@@ -261,8 +302,8 @@ export default function App() {
     } finally {
       setIsLoggedIn(false);
       setCurrentUser(null);
-      setPostAuthRedirect('home');
-      setCurrentPage('home');
+      setPostAuthRedirect('/');
+      navigate('/', { replace: true });
       setUserProducts([]);
       setPurchasedItems([]);
     }
