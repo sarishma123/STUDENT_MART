@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 export default function AddProductPage({ onAddProduct, setCurrentPage }) {
+  const [imageFile, setImageFile] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
     category: 'Notes',
@@ -14,11 +15,11 @@ export default function AddProductPage({ onAddProduct, setCurrentPage }) {
     setFormData({ ...formData, [field]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (formData.title && formData.price) {
-      onAddProduct(formData);
+      await onAddProduct({ ...formData, imageFile });
     }
   };
 
@@ -99,12 +100,11 @@ export default function AddProductPage({ onAddProduct, setCurrentPage }) {
         </div>
 
         <label className="field-group">
-          Image URL <span className="muted">(optional)</span>
+          Item photo <span className="muted">(optional, JPEG, PNG, or WebP; max 5 MB)</span>
           <input
-            type="url"
-            placeholder="https://example.com/your-item.jpg"
-            value={formData.image}
-            onChange={(e) => updateField('image', e.target.value)}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={(e) => setImageFile(e.target.files?.[0] || null)}
             className="field"
           />
         </label>

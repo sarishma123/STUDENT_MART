@@ -59,6 +59,28 @@ const jsonRequest = (endpoint, body, method = 'POST') =>
     body: JSON.stringify(body),
   })
 
+async function uploadProductImage(file) {
+  const formData = new FormData()
+  formData.append('image', file)
+
+  const response = await fetch(`${API_BASE}/upload.php`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: {
+      Accept: 'application/json',
+      'X-CSRF-Token': await ensureCsrfToken(),
+    },
+    body: formData,
+  })
+  const data = await response.json()
+
+  if (!response.ok) {
+    throw new Error(data.message || 'Image upload failed')
+  }
+
+  return data
+}
+
 export const api = {
   login: (email, password) => jsonRequest('/auth.php', { type: 'login', email, password }),
   register: (name, email, password) =>
@@ -81,6 +103,7 @@ export const api = {
   getPurchasedProducts: () => apiRequest('/products.php?purchases=1'),
   getProduct: (productId) => apiRequest(`/products.php?id=${encodeURIComponent(productId)}`),
   createProduct: (product) => jsonRequest('/products.php', product),
+  uploadProductImage,
   purchaseProduct: (productId) => jsonRequest('/products.php', { type: 'purchase', product_id: productId }),
   updateProduct: (product) => jsonRequest('/products.php', product, 'PUT'),
   deleteProduct: (productId) => jsonRequest('/products.php', { product_id: productId }, 'DELETE'),

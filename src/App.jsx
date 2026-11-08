@@ -44,6 +44,13 @@ function normalizeCategory(categoryName) {
   return 'Other';
 }
 
+function normalizeImage(image) {
+  if (typeof image !== 'string') return null;
+  return image.startsWith('/api/upload.php?file=') || /^https?:\/\//i.test(image)
+    ? image
+    : null;
+}
+
 function pageToPath(page) {
   if (page === 'home') return '/';
   if (page === 'browse') return '/browse';
@@ -107,7 +114,7 @@ export default function App() {
     category: normalizeCategory(p.category_name),
     price: Number(p.price) || 0,
     condition: p.condition || 'Good',
-    image: p.image || null,
+    image: normalizeImage(p.image),
     posted: p.created_at ? new Date(p.created_at).toLocaleDateString() : 'Recently',
     ownerId: Number(p.user_id) || 0,
     isSold: p.status === 'sold',
@@ -311,13 +318,16 @@ export default function App() {
 
   const handleAddProduct = async (productData) => {
     try {
+      const image = productData.imageFile
+        ? (await api.uploadProductImage(productData.imageFile)).image
+        : productData.image || null;
       const payload = {
         title: productData.title,
         category_id: categoryIds[productData.category] || categoryIds.Other,
         description: productData.description || '',
         price: Number(productData.price),
         condition: productData.condition || 'Good',
-        image: productData.image || null,
+        image,
       };
 
       await api.createProduct(payload);
@@ -343,6 +353,9 @@ export default function App() {
 
   const handleUpdateProduct = async (updatedProduct) => {
     try {
+      const image = updatedProduct.imageFile
+        ? (await api.uploadProductImage(updatedProduct.imageFile)).image
+        : updatedProduct.image || null;
       const payload = {
         product_id: updatedProduct.id,
         title: updatedProduct.title,
@@ -350,7 +363,7 @@ export default function App() {
         description: updatedProduct.description || '',
         price: Number(updatedProduct.price),
         condition: updatedProduct.condition || 'Good',
-        image: updatedProduct.image || null,
+        image,
       };
 
       await api.updateProduct(payload);

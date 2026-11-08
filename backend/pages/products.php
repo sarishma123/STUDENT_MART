@@ -22,6 +22,23 @@ function ensurePurchaseColumns(mysqli $conn): void {
 
 ensurePurchaseColumns($conn);
 
+function removeUploadedProductImage(?string $image): void {
+    if (!is_string($image)
+        || !preg_match('#^/api/upload\.php\?file=([a-f0-9]{32}\.(?:jpg|png|webp))$#', $image, $matches)) {
+        return;
+    }
+
+    $uploadDirectory = realpath(dirname(__DIR__, 2) . DIRECTORY_SEPARATOR . 'uploads');
+    $imagePath = $uploadDirectory === false
+        ? false
+        : realpath($uploadDirectory . DIRECTORY_SEPARATOR . $matches[1]);
+    if ($imagePath !== false
+        && str_starts_with($imagePath, $uploadDirectory . DIRECTORY_SEPARATOR)
+        && is_file($imagePath)) {
+        unlink($imagePath);
+    }
+}
+
 function readProductInput(): array {
     $input = json_decode(file_get_contents('php://input'), true);
     if (!is_array($input)) {
@@ -43,7 +60,9 @@ function validateProductInput(array $input, bool $allowStatus = false): array {
         $image = null;
     }
 
-    $imageIsValid = $image === null || (
+    $isUploadedImage = is_string($image)
+        && preg_match('/^\/api\/upload\.php\?file=[a-f0-9]{32}\.(jpg|png|webp)$/', $image);
+    $imageIsValid = $image === null || $isUploadedImage || (
         strlen($image) <= 255
         && filter_var($image, FILTER_VALIDATE_URL)
         && in_array(parse_url($image, PHP_URL_SCHEME), ['http', 'https'], true)
@@ -250,10 +269,11 @@ if ($method === 'PUT') {
         jsonError('Invalid product ID');
     }
 
-    $check = $conn->prepare("SELECT product_id FROM products WHERE product_id = ? AND user_id = ?");
+    $check = $conn->prepare("SELECT product_id, image FROM products WHERE product_id = ? AND user_id = ?");
     $check->bind_param("ii", $productId, $userId);
     $check->execute();
-    if ($check->get_result()->num_rows === 0) {
+    $existingProduct = $check->get_result()->fetch_assoc();
+    if (!$existingProduct) {
         jsonError('Product not found or unauthorized', 403);
     }
 
@@ -267,6 +287,9 @@ if ($method === 'PUT') {
     $stmt->bind_param("sisdsissi", $title, $categoryId, $description, $price, $condition, $image, $status, $productId, $userId);
 
     if ($stmt->execute()) {
+        if ($existingProduct['image'] !== $image) {
+            removeUploadedProductImage($existingProduct['image']);
+        }
         jsonResponse(['success' => true, 'message' => 'Product updated successfully']);
     } else {
         jsonError('Failed to update product');
@@ -299,19 +322,7 @@ if ($method === 'DELETE') {
     $stmt->bind_param("ii", $productId, $userId);
 
     if ($stmt->execute()) {
-        if (!empty($product['image'])) {
-            $uploadDirectory = realpath(__DIR__ . '/uploads');
-            $imagePath = $uploadDirectory === false
-                ? false
-                : realpath($uploadDirectory . DIRECTORY_SEPARATOR . $product['image']);
-            $isUploadFile = $uploadDirectory !== false
-                && $imagePath !== false
-                && str_starts_with($imagePath, $uploadDirectory . DIRECTORY_SEPARATOR)
-                && is_file($imagePath);
-            if ($isUploadFile) {
-                unlink($imagePath);
-            }
-        }
+        removeUploadedProductImage($product['image']);
         jsonResponse(['success' => true, 'message' => 'Product deleted successfully']);
     } else {
         jsonError('Failed to delete product');

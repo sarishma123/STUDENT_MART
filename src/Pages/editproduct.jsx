@@ -2,10 +2,11 @@ import { useState } from 'react';
 
 export default function EditProductPage({ product, onUpdate, setCurrentPage }) {
   const [formData, setFormData] = useState(product);
+  const [imageFile, setImageFile] = useState(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await onUpdate(formData);
+    await onUpdate({ ...formData, imageFile });
   };
 
   return (
@@ -61,12 +62,11 @@ export default function EditProductPage({ product, onUpdate, setCurrentPage }) {
         </label>
 
         <label className="field-group">
-          Image URL <span className="muted">(optional)</span>
+          Replace item photo <span className="muted">(optional, JPEG, PNG, or WebP; max 5 MB)</span>
           <input
-            type="url"
-            placeholder="https://example.com/your-item.jpg"
-            value={formData.image || ''}
-            onChange={(e) => setFormData({ ...formData, image: e.target.value })}
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={(e) => setImageFile(e.target.files?.[0] || null)}
             className="field"
           />
         </label>
