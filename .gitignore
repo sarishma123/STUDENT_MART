@@ -24,6 +24,7 @@ dist-ssr
 *.sw?
 .env
 vendor/
-uploads/
+uploads/*
+!uploads/.htaccess
 node_modules/
 .DS_Store
