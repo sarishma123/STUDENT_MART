@@ -1,4 +1,5 @@
-import { LogIn, LogOut, Plus } from 'lucide-react';
+import { LogIn, LogOut, Menu, Plus, X } from 'lucide-react';
+import { useState } from 'react';
 
 export default function Header({
   currentUser,
@@ -8,6 +9,12 @@ export default function Header({
   onBuySellClick,
   isLoggedIn,
 }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const goTo = (page) => {
+    setCurrentPage(page);
+    setMenuOpen(false);
+  };
+
   return (
     <header className="site-header">
       <button className="site-brand" type="button" onClick={() => setCurrentPage('home')}>
@@ -15,30 +22,31 @@ export default function Header({
         <span className="site-brand__name">On-Campus Mart</span>
       </button>
 
-      <nav className="site-nav">
-        <button onClick={() => setCurrentPage('home')} className="site-nav__link">
+      <button type="button" className="site-menu-toggle" onClick={() => setMenuOpen((open) => !open)} aria-expanded={menuOpen} aria-label="Toggle menu">
+        {menuOpen ? <X size={20} /> : <Menu size={20} />}
+      </button>
+
+      <nav className={`site-nav ${menuOpen ? 'site-nav--open' : ''}`}>
+        <button onClick={() => goTo('home')} className="site-nav__link">
           Home
         </button>
-        <button onClick={() => setCurrentPage('browse')} className="site-nav__link">
+        <button onClick={() => goTo('browse')} className="site-nav__link">
           Browse
         </button>
-        <button onClick={() => setCurrentPage('startup-check')} className="site-nav__link">
-          System Check
-        </button>
-        <button onClick={onBuySellClick} className="site-nav__link">
+        <button onClick={() => { onBuySellClick(); setMenuOpen(false); }} className="site-nav__link">
           Buy/Sell
         </button>
         {isLoggedIn && (
           <>
             {currentUser?.role === 'admin' && (
-              <button onClick={() => setCurrentPage('admin')} className="site-nav__link">
+              <button onClick={() => goTo('admin')} className="site-nav__link">
                 Admin
               </button>
             )}
-            <button onClick={() => setCurrentPage('dashboard')} className="site-nav__link">
+            <button onClick={() => goTo('dashboard')} className="site-nav__link">
               Dashboard
             </button>
-            <button onClick={() => setCurrentPage('profile')} className="site-nav__link">
+            <button onClick={() => goTo('profile')} className="site-nav__link">
               {currentUser?.name || 'Profile'}
             </button>
           </>

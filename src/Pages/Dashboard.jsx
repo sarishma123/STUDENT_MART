@@ -1,5 +1,6 @@
 import { Edit2, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import ConfirmDialog from '../component/ConfirmDialog';
 
 export default function DashboardPage({
   userProducts,
@@ -12,6 +13,7 @@ export default function DashboardPage({
 }) {
   const [contacts, setContacts] = useState({});
   const [contactError, setContactError] = useState('');
+  const [pendingDelete, setPendingDelete] = useState(null);
   const soldListingsCount = userProducts.filter((item) => item.isSold).length;
   const activeListingsCount = userProducts.length - soldListingsCount;
   const myPurchasedItems = purchasedItems.filter((item) => item.buyerId === currentUser?.id);
@@ -28,6 +30,18 @@ export default function DashboardPage({
 
   return (
     <div className="page page--medium">
+      {pendingDelete && (
+        <ConfirmDialog
+          title="Delete this listing?"
+          message="This permanently removes the listing and its uploaded photo."
+          confirmLabel="Delete listing"
+          onCancel={() => setPendingDelete(null)}
+          onConfirm={() => {
+            onDeleteProduct(pendingDelete);
+            setPendingDelete(null);
+          }}
+        />
+      )}
       <div className="dashboard-header">
         <h1 className="section-title"> My Dashboard</h1>
         <button onClick={() => setCurrentPage('add-product')} className="btn btn-primary">
@@ -95,7 +109,7 @@ export default function DashboardPage({
                       <Edit2 size={16} />
                     </button>
                     <button
-                      onClick={() => onDeleteProduct(item.id)}
+                      onClick={() => setPendingDelete(item.id)}
                       className="icon-button icon-button--danger"
                       aria-label="Delete item"
                     >

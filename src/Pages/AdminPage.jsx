@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { ShieldCheck, Trash2 } from 'lucide-react';
+import ConfirmDialog from '../component/ConfirmDialog';
 
 export default function AdminPage({ onLoad, onDeleteProduct, onBack }) {
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
+  const [pendingDelete, setPendingDelete] = useState(null);
 
   const loadDashboard = useCallback(async () => {
     try {
@@ -19,8 +21,6 @@ export default function AdminPage({ onLoad, onDeleteProduct, onBack }) {
   }, [loadDashboard]);
 
   const handleDelete = useCallback(async (productId) => {
-    if (!window.confirm('Remove this product from the marketplace?')) return;
-
     try {
       await onDeleteProduct(productId);
       await loadDashboard();
@@ -35,6 +35,18 @@ export default function AdminPage({ onLoad, onDeleteProduct, onBack }) {
 
   return (
     <main className="page page--wide">
+      {pendingDelete && (
+        <ConfirmDialog
+          title="Remove this listing?"
+          message="This action removes the listing from the marketplace and cannot be undone."
+          confirmLabel="Remove listing"
+          onCancel={() => setPendingDelete(null)}
+          onConfirm={() => {
+            handleDelete(pendingDelete);
+            setPendingDelete(null);
+          }}
+        />
+      )}
       <div className="section-heading">
         <div>
           <p className="eyebrow"><ShieldCheck size={16} /> Administrator</p>
@@ -71,7 +83,7 @@ export default function AdminPage({ onLoad, onDeleteProduct, onBack }) {
                   <strong>{product.title}</strong>
                   <p className="muted">{product.seller} · {product.category} · {product.status}</p>
                 </div>
-                <button type="button" className="btn btn-danger" onClick={() => handleDelete(product.id)}>
+                <button type="button" className="btn btn-danger" onClick={() => setPendingDelete(product.id)}>
                   <Trash2 size={16} /> Remove
                 </button>
               </div>
@@ -91,7 +103,7 @@ export default function AdminPage({ onLoad, onDeleteProduct, onBack }) {
                   <p className="muted">{report.reason} · Reported by {report.reporter}</p>
                   {report.details && <p className="muted">{report.details}</p>}
                 </div>
-                <button type="button" className="btn btn-danger" onClick={() => handleDelete(report.product_id)}>
+                <button type="button" className="btn btn-danger" onClick={() => setPendingDelete(report.product_id)}>
                   <Trash2 size={16} /> Remove listing
                 </button>
               </div>
