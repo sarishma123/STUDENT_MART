@@ -470,7 +470,7 @@ export default function App() {
 
     switch (currentPage) {
       case 'home':
-        return <Navigate to="/" replace />;
+        return renderHome();
 
       case 'browse':
         return renderBrowse();
@@ -513,7 +513,7 @@ export default function App() {
             onDeleteProduct={handleDeleteAdminProduct}
             onBack={() => setCurrentPage('home')}
           />
-        ) : renderHome();
+        ) : <Navigate to="/" replace />;
 
       case 'change-password':
         return (
@@ -542,7 +542,14 @@ export default function App() {
               isLoggedIn={isLoggedIn}
               setCurrentPage={setCurrentPage}
             />
-          ) : null;
+          ) : (
+            <div className="page page--narrow empty-state">
+              <p className="muted">This listing is unavailable or no longer active.</p>
+              <button type="button" className="btn btn-primary" onClick={() => setCurrentPage('browse')}>
+                Browse available items
+              </button>
+            </div>
+          );
         }
 
         if (currentPage.startsWith('edit-')) {
