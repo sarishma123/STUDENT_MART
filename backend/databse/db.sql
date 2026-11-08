@@ -67,8 +67,11 @@ CREATE TABLE IF NOT EXISTS products (
   `condition` VARCHAR(20) NOT NULL,
   image VARCHAR(255),
   status VARCHAR(20) DEFAULT 'active',
+  buyer_id INT NULL,
+  sold_at DATETIME NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+  FOREIGN KEY (buyer_id) REFERENCES users(user_id) ON DELETE SET NULL,
   FOREIGN KEY (category_id) REFERENCES categories(category_id)
 );
  
@@ -89,4 +92,5 @@ CREATE INDEX idx_user_id ON products(user_id);
 CREATE INDEX idx_category_id ON products(category_id);
 CREATE INDEX idx_email ON users(email);
 CREATE INDEX idx_status ON products(status);
- 
+CREATE INDEX idx_buyer_id ON products(buyer_id);
+

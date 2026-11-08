@@ -10,7 +10,7 @@ export default function DashboardPage({
 }) {
   const soldListingsCount = userProducts.filter((item) => item.isSold).length;
   const activeListingsCount = userProducts.length - soldListingsCount;
-  const myPurchasedItems = purchasedItems.filter((item) => item.soldToId === currentUser?.id);
+  const myPurchasedItems = purchasedItems.filter((item) => item.buyerId === currentUser?.id);
 
   return (
     <div className="page page--medium">

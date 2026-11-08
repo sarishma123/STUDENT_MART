@@ -70,6 +70,8 @@ export default function App() {
     posted: p.created_at ? new Date(p.created_at).toLocaleDateString() : 'Recently',
     ownerId: Number(p.user_id) || 0,
     isSold: p.status === 'sold',
+    buyerId: Number(p.buyer_id) || 0,
+    soldAt: p.sold_at ? new Date(p.sold_at).toLocaleDateString() : null,
     description: p.description || '',
   });
 
@@ -101,6 +103,18 @@ export default function App() {
     }
   };
 
+  const loadPurchasedItems = async () => {
+    if (!currentUser?.id) return;
+    try {
+      const data = await api.getPurchasedProducts();
+      const apiProducts = data.products || data;
+      const mapped = Array.isArray(apiProducts) ? apiProducts.map(mapApiProduct) : [];
+      setPurchasedItems(mapped);
+    } catch (error) {
+      console.warn('Could not load purchased products:', error.message);
+    }
+  };
+
   useEffect(() => {
     loadProducts();
     checkAuth();
@@ -109,6 +123,7 @@ export default function App() {
   useEffect(() => {
     if (isLoggedIn) {
       loadUserProducts();
+      loadPurchasedItems();
     }
   }, [isLoggedIn, currentUser]);
 
@@ -330,21 +345,12 @@ export default function App() {
     }
 
     try {
-      await api.updateProduct({
-        product_id: productId,
-        title: selectedProduct.title,
-        category_id: categoryIds[selectedProduct.category] || categoryIds.Other,
-        description: selectedProduct.description,
-        price: selectedProduct.price,
-        condition: selectedProduct.condition,
-        status: 'sold',
-      });
+      await api.purchaseProduct(productId);
 
       const purchasedProduct = {
         ...selectedProduct,
         isSold: true,
-        soldToId: currentUser.id,
-        soldToName: currentUser.name,
+        buyerId: currentUser.id,
         soldAt: 'Just now',
       };
 

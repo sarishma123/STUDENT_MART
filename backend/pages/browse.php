@@ -51,7 +51,7 @@ if (!empty($params)) {
 $countStmt->execute();
 $total = $countStmt->get_result()->fetch_assoc()['total'];
 
-    $sql = "SELECT p.product_id, p.title, p.description, p.price, p.`condition`, p.image, p.status, p.created_at,
+    $sql = "SELECT p.product_id, p.user_id, p.title, p.description, p.price, p.`condition`, p.image, p.status, p.created_at,
                u.full_name, u.campus, c.category_name
         FROM products p
         JOIN users u ON p.user_id = u.user_id
@@ -72,6 +72,7 @@ $products = [];
 while ($row = $result->fetch_assoc()) {
     $products[] = [
         'product_id' => (int)$row['product_id'],
+        'user_id' => (int)$row['user_id'],
         'title' => $row['title'],
         'description' => $row['description'],
         'price' => (float)$row['price'],

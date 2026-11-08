@@ -78,8 +78,10 @@ export const api = {
   deleteAdminProduct: (productId) => jsonRequest('/admin.php', { product_id: productId }, 'DELETE'),
   getProducts: () => apiRequest('/browse.php'),
   getUserProducts: (userId) => apiRequest(`/products.php?user_id=${encodeURIComponent(userId)}`),
+  getPurchasedProducts: () => apiRequest('/products.php?purchases=1'),
   getProduct: (productId) => apiRequest(`/products.php?id=${encodeURIComponent(productId)}`),
   createProduct: (product) => jsonRequest('/products.php', product),
+  purchaseProduct: (productId) => jsonRequest('/products.php', { type: 'purchase', product_id: productId }),
   updateProduct: (product) => jsonRequest('/products.php', product, 'PUT'),
   deleteProduct: (productId) => jsonRequest('/products.php', { product_id: productId }, 'DELETE'),
 }

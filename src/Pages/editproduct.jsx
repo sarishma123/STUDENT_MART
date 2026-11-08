@@ -3,11 +3,9 @@ import { useState } from 'react';
 export default function EditProductPage({ product, onUpdate, setCurrentPage }) {
   const [formData, setFormData] = useState(product);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onUpdate(formData);
-    alert(' Product updated!');
-    setCurrentPage('dashboard');
+    await onUpdate(formData);
   };
 
   return (
@@ -58,6 +56,17 @@ export default function EditProductPage({ product, onUpdate, setCurrentPage }) {
             type="number"
             value={formData.price}
             onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+            className="field"
+          />
+        </label>
+
+        <label className="field-group">
+          Image URL <span className="muted">(optional)</span>
+          <input
+            type="url"
+            placeholder="https://example.com/your-item.jpg"
+            value={formData.image || ''}
+            onChange={(e) => setFormData({ ...formData, image: e.target.value })}
             className="field"
           />
         </label>

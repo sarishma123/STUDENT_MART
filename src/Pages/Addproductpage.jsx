@@ -7,7 +7,7 @@ export default function AddProductPage({ onAddProduct, setCurrentPage }) {
     description: '',
     price: '',
     condition: 'Good',
-    image: '📦',
+    image: '',
   });
 
   const updateField = (field, value) => {
@@ -97,6 +97,17 @@ export default function AddProductPage({ onAddProduct, setCurrentPage }) {
             </select>
           </label>
         </div>
+
+        <label className="field-group">
+          Image URL <span className="muted">(optional)</span>
+          <input
+            type="url"
+            placeholder="https://example.com/your-item.jpg"
+            value={formData.image}
+            onChange={(e) => updateField('image', e.target.value)}
+            className="field"
+          />
+        </label>
 
         <div className="field-actions">
           <button type="button" onClick={() => setCurrentPage('home')} className="btn btn-secondary btn-block">

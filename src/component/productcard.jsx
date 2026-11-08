@@ -7,7 +7,11 @@ export default function ProductCard({
   return (
     <article className={`product-card ${product.isSold ? 'product-card--sold' : ''}`} onClick={onViewDetails}>
       <div className="product-card__media">
-        <span aria-hidden="true">{product.image}</span>
+        {product.image ? (
+          <img src={product.image} alt={product.title} className="product-card__image" />
+        ) : (
+          <span className="product-card__placeholder" aria-hidden="true">Item photo</span>
+        )}
 
         {product.isSold && <span className="product-card__sold-tag">Sold</span>}
 

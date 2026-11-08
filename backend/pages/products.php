@@ -4,6 +4,24 @@
 
 require_once __DIR__ . '/../includes/header.php';
 
+function ensurePurchaseColumns(mysqli $conn): void {
+    $columns = $conn->query("SELECT COLUMN_NAME FROM information_schema.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'products'");
+    $existing = array_column($columns->fetch_all(MYSQLI_ASSOC), 'COLUMN_NAME');
+
+    if (!in_array('buyer_id', $existing, true)) {
+        $conn->query('ALTER TABLE products ADD COLUMN buyer_id INT NULL AFTER status');
+        $conn->query('ALTER TABLE products ADD CONSTRAINT fk_products_buyer FOREIGN KEY (buyer_id) REFERENCES users(user_id) ON DELETE SET NULL');
+        $conn->query('CREATE INDEX idx_buyer_id ON products(buyer_id)');
+    }
+
+    if (!in_array('sold_at', $existing, true)) {
+        $conn->query('ALTER TABLE products ADD COLUMN sold_at DATETIME NULL AFTER buyer_id');
+    }
+}
+
+ensurePurchaseColumns($conn);
+
 function readProductInput(): array {
     $input = json_decode(file_get_contents('php://input'), true);
     if (!is_array($input)) {
@@ -21,12 +39,22 @@ function validateProductInput(array $input, bool $allowStatus = false): array {
     $categoryId = filter_var($input['category_id'] ?? null, FILTER_VALIDATE_INT);
     $price = $input['price'] ?? null;
 
+    if ($image === '') {
+        $image = null;
+    }
+
+    $imageIsValid = $image === null || (
+        strlen($image) <= 255
+        && filter_var($image, FILTER_VALIDATE_URL)
+        && in_array(parse_url($image, PHP_URL_SCHEME), ['http', 'https'], true)
+    );
+
     if ($title === '' || strlen($title) > 150 || preg_match('/[\x00-\x1F\x7F]/', $title)
         || $description === '' || strlen($description) > 5000 || preg_match('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', $description)
         || $condition === '' || strlen($condition) > 20 || preg_match('/[\x00-\x1F\x7F]/', $condition)
         || $categoryId === false || $categoryId < 1
         || !is_numeric($price) || !is_finite((float)$price) || (float)$price <= 0 || (float)$price > 99999999.99
-        || ($image !== null && (strlen($image) > 255 || preg_match('/[\\\/]/', $image)))) {
+        || !$imageIsValid) {
         jsonError('Invalid product fields.', 422);
     }
 
@@ -116,7 +144,44 @@ if ($method === 'GET') {
                 'image' => $row['image'],
                 'status' => $row['status'],
                 'created_at' => $row['created_at'],
-                'category_name' => $row['category_name']
+                'category_name' => $row['category_name'],
+                'user_id' => (int)$row['user_id']
+            ];
+        }
+        jsonResponse(['products' => $products]);
+    }
+
+    if (isset($_GET['purchases'])) {
+        if (!isLoggedIn()) {
+            jsonError('Authentication required', 401);
+        }
+
+        $buyerId = $_SESSION['user_id'];
+        $stmt = $conn->prepare("SELECT p.*, u.full_name, c.category_name
+                                FROM products p
+                                JOIN users u ON p.user_id = u.user_id
+                                JOIN categories c ON p.category_id = c.category_id
+                                WHERE p.buyer_id = ? AND p.status = 'sold'
+                                ORDER BY p.sold_at DESC");
+        $stmt->bind_param('i', $buyerId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $products = [];
+        while ($row = $result->fetch_assoc()) {
+            $products[] = [
+                'product_id' => (int)$row['product_id'],
+                'title' => $row['title'],
+                'description' => $row['description'],
+                'price' => (float)$row['price'],
+                'condition' => $row['condition'],
+                'image' => $row['image'],
+                'status' => $row['status'],
+                'created_at' => $row['created_at'],
+                'sold_at' => $row['sold_at'],
+                'user_id' => (int)$row['user_id'],
+                'buyer_id' => (int)$row['buyer_id'],
+                'full_name' => $row['full_name'],
+                'category_name' => $row['category_name'],
             ];
         }
         jsonResponse(['products' => $products]);
@@ -132,6 +197,25 @@ if ($method === 'POST') {
 
     $input = readProductInput();
     $userId = $_SESSION['user_id'];
+
+    if (($input['type'] ?? '') === 'purchase') {
+        $productId = positiveInteger($input['product_id'] ?? null);
+        if ($productId <= 0) {
+            jsonError('Invalid product ID.', 422);
+        }
+
+        $stmt = $conn->prepare("UPDATE products
+            SET status = 'sold', buyer_id = ?, sold_at = NOW()
+            WHERE product_id = ? AND user_id <> ? AND status = 'active'");
+        $stmt->bind_param('iii', $userId, $productId, $userId);
+        $stmt->execute();
+
+        if ($stmt->affected_rows !== 1) {
+            jsonError('This listing is no longer available.', 409);
+        }
+
+        jsonResponse(['success' => true, 'message' => 'Purchase recorded successfully.']);
+    }
 
     [$title, $categoryId, $description, $price, $condition, $image] = validateProductInput($input);
     if (!categoryExists($conn, $categoryId)) {

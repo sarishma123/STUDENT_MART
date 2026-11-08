@@ -18,7 +18,13 @@ export default function ProductDetailPage({
       </button>
 
       <div className="detail-layout detail-card surface">
-        <div className="detail-media">{product.image}</div>
+        <div className="detail-media">
+          {product.image ? (
+            <img src={product.image} alt={product.title} className="detail-image" />
+          ) : (
+            <span className="detail-media__placeholder">No image available</span>
+          )}
+        </div>
 
         <div>
           <div className="detail-top mb-md">
