@@ -458,12 +458,19 @@ export default function App() {
         return renderBrowse();
       }
 
-      return renderHome();
+      if (
+        ['add-product', 'dashboard', 'profile', 'change-password', 'admin'].includes(currentPage)
+        || currentPage.startsWith('edit-')
+      ) {
+        return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+      }
+
+      return currentPage === 'not-found' ? <Navigate to="/" replace /> : renderHome();
     }
 
     switch (currentPage) {
       case 'home':
-        return renderHome();
+        return <Navigate to="/" replace />;
 
       case 'browse':
         return renderBrowse();

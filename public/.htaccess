@@ -1,0 +1,7 @@
+RewriteEngine On
+
+# Let Apache serve real files and API directories normally; send all other
+# requests to the React app so direct links such as /products/42 still work.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.html [L]
