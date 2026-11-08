@@ -52,6 +52,7 @@ export default function AdminPage({ onLoad, onDeleteProduct, onBack }) {
           ['Products', data.stats.products],
           ['Active listings', data.stats.active_products],
           ['Sold listings', data.stats.sold_products],
+          ['Reports', data.stats.reports],
         ].map(([label, value]) => (
           <div className="dashboard-panel" key={label}>
             <p className="muted">{label}</p>
@@ -72,6 +73,26 @@ export default function AdminPage({ onLoad, onDeleteProduct, onBack }) {
                 </div>
                 <button type="button" className="btn btn-danger" onClick={() => handleDelete(product.id)}>
                   <Trash2 size={16} /> Remove
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <section className="dashboard-panel mt-lg">
+        <h2 className="section-title section-title--compact">Listing reports</h2>
+        {data.reports.length === 0 ? <p className="muted">No reports to review.</p> : (
+          <div className="admin-list">
+            {data.reports.map((report) => (
+              <div className="admin-list__row" key={report.id}>
+                <div>
+                  <strong>{report.title}</strong>
+                  <p className="muted">{report.reason} · Reported by {report.reporter}</p>
+                  {report.details && <p className="muted">{report.details}</p>}
+                </div>
+                <button type="button" className="btn btn-danger" onClick={() => handleDelete(report.product_id)}>
+                  <Trash2 size={16} /> Remove listing
                 </button>
               </div>
             ))}

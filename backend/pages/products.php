@@ -111,6 +111,29 @@ function positiveInteger($value): int {
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {
+    $contactProductId = positiveInteger($_GET['contact_product_id'] ?? null);
+    if ($contactProductId > 0) {
+        if (!isLoggedIn()) {
+            jsonError('Authentication required', 401);
+        }
+
+        $stmt = $conn->prepare("SELECT p.user_id, p.buyer_id, u.full_name, u.email, u.campus
+                                FROM products p JOIN users u ON u.user_id = p.user_id
+                                WHERE p.product_id = ? AND p.status = 'sold'");
+        $stmt->bind_param('i', $contactProductId);
+        $stmt->execute();
+        $product = $stmt->get_result()->fetch_assoc();
+        if (!$product || (int)$product['buyer_id'] !== (int)$_SESSION['user_id']) {
+            jsonError('Seller contact is available only to the recorded buyer.', 403);
+        }
+
+        jsonResponse(['seller' => [
+            'name' => $product['full_name'],
+            'email' => $product['email'],
+            'campus' => $product['campus'] ?? '',
+        ]]);
+    }
+
     $id = positiveInteger($_GET['id'] ?? null);
     
     if ($id > 0) {

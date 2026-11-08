@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 export default function ProductDetailPage({
   product,
   wishlist,
@@ -7,9 +9,18 @@ export default function ProductDetailPage({
   currentUser,
   isLoggedIn,
   setCurrentPage,
+  onReportProduct,
 }) {
   const isOwner = isLoggedIn && currentUser?.id === product.ownerId;
   const isSold = Boolean(product.isSold);
+  const [reportReason, setReportReason] = useState('');
+  const [reportMessage, setReportMessage] = useState('');
+
+  const submitReport = async () => {
+    if (!reportReason) return;
+    const result = await onReportProduct(product.id, reportReason);
+    setReportMessage(result.message || 'Please sign in to report this listing.');
+  };
 
   return (
     <div className="page page--medium">
@@ -90,6 +101,31 @@ export default function ProductDetailPage({
             <button className="btn btn-secondary btn-block" disabled>
               Sold {product.soldToName ? `to ${product.soldToName}` : ''}
             </button>
+          )}
+
+          {!isOwner && !isSold && (
+            <div className="report-listing">
+              <label className="detail-meta-label" htmlFor="report-reason">Report this listing</label>
+              <div className="report-listing__controls">
+                <select
+                  id="report-reason"
+                  className="field"
+                  value={reportReason}
+                  onChange={(event) => setReportReason(event.target.value)}
+                >
+                  <option value="">Select a reason</option>
+                  <option value="spam">Spam</option>
+                  <option value="scam">Suspected scam</option>
+                  <option value="prohibited">Prohibited item</option>
+                  <option value="inappropriate">Inappropriate content</option>
+                  <option value="other">Other</option>
+                </select>
+                <button type="button" className="btn btn-secondary" disabled={!reportReason} onClick={submitReport}>
+                  Submit report
+                </button>
+              </div>
+              {reportMessage && <p className="muted text-sm mb-0">{reportMessage}</p>}
+            </div>
           )}
 
           <button onClick={() => setCurrentPage('browse')} className="btn btn-secondary btn-block">

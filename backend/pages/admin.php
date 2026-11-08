@@ -4,6 +4,18 @@ require_once __DIR__ . '/../includes/header.php';
 
 requireRole('admin');
 
+$conn->query("CREATE TABLE IF NOT EXISTS product_reports (
+    report_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    product_id INT NOT NULL,
+    reporter_user_id INT NOT NULL,
+    reason ENUM('spam', 'scam', 'prohibited', 'inappropriate', 'other') NOT NULL,
+    details VARCHAR(1000) NOT NULL DEFAULT '',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_product_reporter (product_id, reporter_user_id),
+    FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE,
+    FOREIGN KEY (reporter_user_id) REFERENCES users(user_id) ON DELETE CASCADE
+)");
+
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {
@@ -48,12 +60,35 @@ if ($method === 'GET') {
         ];
     }
 
+    $reportsResult = $conn->query(
+        'SELECT r.report_id, r.reason, r.details, r.created_at, p.product_id, p.title,
+                reporter.full_name AS reporter_name
+         FROM product_reports r
+         INNER JOIN products p ON p.product_id = r.product_id
+         INNER JOIN users reporter ON reporter.user_id = r.reporter_user_id
+         ORDER BY r.created_at DESC
+         LIMIT 100'
+    );
+    $reports = [];
+    while ($report = $reportsResult->fetch_assoc()) {
+        $reports[] = [
+            'id' => (int)$report['report_id'],
+            'product_id' => (int)$report['product_id'],
+            'title' => $report['title'],
+            'reason' => $report['reason'],
+            'details' => $report['details'],
+            'reporter' => $report['reporter_name'],
+            'created_at' => $report['created_at'],
+        ];
+    }
+
     $statsResult = $conn->query(
         "SELECT
             (SELECT COUNT(*) FROM users) AS users,
             (SELECT COUNT(*) FROM products) AS products,
             (SELECT COUNT(*) FROM products WHERE status = 'active') AS active_products,
-            (SELECT COUNT(*) FROM products WHERE status = 'sold') AS sold_products"
+            (SELECT COUNT(*) FROM products WHERE status = 'sold') AS sold_products,
+            (SELECT COUNT(*) FROM product_reports) AS reports"
     );
     $stats = $statsResult->fetch_assoc();
 
@@ -63,9 +98,11 @@ if ($method === 'GET') {
             'products' => (int)$stats['products'],
             'active_products' => (int)$stats['active_products'],
             'sold_products' => (int)$stats['sold_products'],
+            'reports' => (int)$stats['reports'],
         ],
         'users' => $users,
         'products' => $products,
+        'reports' => $reports,
     ]);
 }
 

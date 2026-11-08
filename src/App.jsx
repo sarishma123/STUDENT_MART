@@ -163,6 +163,16 @@ export default function App() {
     }
   };
 
+  const loadWishlist = async () => {
+    if (!currentUser?.id) return;
+    try {
+      const data = await api.getWishlist();
+      setWishlist(Array.isArray(data.product_ids) ? data.product_ids : []);
+    } catch (error) {
+      console.warn('Could not load wishlist:', error.message);
+    }
+  };
+
   useEffect(() => {
     loadProducts();
     checkAuth();
@@ -172,6 +182,7 @@ export default function App() {
     if (isLoggedIn) {
       loadUserProducts();
       loadPurchasedItems();
+      loadWishlist();
     }
   }, [isLoggedIn, currentUser]);
 
@@ -420,12 +431,42 @@ export default function App() {
     }
   };
 
-  const toggleWishlist = (productId) => {
-    if (wishlist.includes(productId)) {
-      setWishlist(wishlist.filter((id) => id !== productId));
-    } else {
-      setWishlist([...wishlist, productId]);
+  const toggleWishlist = async (productId) => {
+    if (!isLoggedIn) {
+      openAuth('login', currentPage);
+      return;
     }
+
+    try {
+      if (wishlist.includes(productId)) {
+        await api.removeFromWishlist(productId);
+        setWishlist((items) => items.filter((id) => id !== productId));
+      } else {
+        await api.addToWishlist(productId);
+        setWishlist((items) => [...items, productId]);
+      }
+    } catch (error) {
+      alert(`Could not update saved items: ${error.message}`);
+    }
+  };
+
+  const handleReportProduct = async (productId, reason) => {
+    if (!isLoggedIn) {
+      openAuth('login', currentPage);
+      return { success: false };
+    }
+
+    try {
+      const data = await api.reportProduct(productId, reason);
+      return { success: true, message: data.message };
+    } catch (error) {
+      return { success: false, message: error.message };
+    }
+  };
+
+  const handleSellerContact = async (productId) => {
+    const data = await api.getSellerContact(productId);
+    return data.seller;
   };
 
   const renderHome = () => (
@@ -504,6 +545,7 @@ export default function App() {
             currentUser={currentUser}
             onDeleteProduct={handleDeleteProduct}
             onEdit={(id) => setCurrentPage(`edit-${id}`)}
+            onGetSellerContact={handleSellerContact}
             setCurrentPage={setCurrentPage}
           />
         );
@@ -551,6 +593,7 @@ export default function App() {
               onToggleWishlist={toggleWishlist}
               onBuyProduct={handleBuyProduct}
               onLoginToBuy={() => openAuth('login', `product-${product.id}`)}
+              onReportProduct={handleReportProduct}
               currentUser={currentUser}
               isLoggedIn={isLoggedIn}
               setCurrentPage={setCurrentPage}

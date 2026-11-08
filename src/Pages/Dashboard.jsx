@@ -1,4 +1,5 @@
 import { Edit2, Plus, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 
 export default function DashboardPage({
   userProducts,
@@ -7,10 +8,23 @@ export default function DashboardPage({
   onDeleteProduct,
   onEdit,
   setCurrentPage,
+  onGetSellerContact,
 }) {
+  const [contacts, setContacts] = useState({});
+  const [contactError, setContactError] = useState('');
   const soldListingsCount = userProducts.filter((item) => item.isSold).length;
   const activeListingsCount = userProducts.length - soldListingsCount;
   const myPurchasedItems = purchasedItems.filter((item) => item.buyerId === currentUser?.id);
+
+  const revealSellerContact = async (productId) => {
+    try {
+      setContactError('');
+      const seller = await onGetSellerContact(productId);
+      setContacts((existing) => ({ ...existing, [productId]: seller }));
+    } catch (error) {
+      setContactError(error.message || 'Could not load seller contact.');
+    }
+  };
 
   return (
     <div className="page page--medium">
@@ -102,6 +116,7 @@ export default function DashboardPage({
           </h2>
         </div>
 
+        {contactError && <p className="auth-error">{contactError}</p>}
         {myPurchasedItems.length === 0 ? (
           <div className="empty-state">
             <p>You have not purchased any items yet.</p>
@@ -117,6 +132,7 @@ export default function DashboardPage({
                 <th>Price</th>
                 <th>Seller</th>
                 <th>Purchased</th>
+                <th>Contact</th>
               </tr>
             </thead>
             <tbody>
@@ -126,6 +142,15 @@ export default function DashboardPage({
                   <td className="text-primary text-strong">Rs. {item.price}</td>
                   <td className="muted">{item.seller}</td>
                   <td className="muted">{item.soldAt || 'Recently'}</td>
+                  <td>
+                    {contacts[item.id] ? (
+                      <span className="muted text-sm">{contacts[item.id].email}</span>
+                    ) : (
+                      <button type="button" className="btn btn-secondary" onClick={() => revealSellerContact(item.id)}>
+                        Show contact
+                      </button>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>

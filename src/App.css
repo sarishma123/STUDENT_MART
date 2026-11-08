@@ -806,6 +806,22 @@ select:focus-visible {
   flex-direction: column;
 }
 
+.report-listing {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.report-listing__controls {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.report-listing__controls .field {
+  flex: 1;
+}
+
 .back-link {
   margin-bottom: 1rem;
   background: transparent;

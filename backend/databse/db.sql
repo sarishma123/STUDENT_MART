@@ -94,3 +94,24 @@ CREATE INDEX idx_email ON users(email);
 CREATE INDEX idx_status ON products(status);
 CREATE INDEX idx_buyer_id ON products(buyer_id);
 
+CREATE TABLE IF NOT EXISTS wishlists (
+  user_id INT NOT NULL,
+  product_id INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (user_id, product_id),
+  FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE,
+  FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS product_reports (
+  report_id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  product_id INT NOT NULL,
+  reporter_user_id INT NOT NULL,
+  reason ENUM('spam', 'scam', 'prohibited', 'inappropriate', 'other') NOT NULL,
+  details VARCHAR(1000) NOT NULL DEFAULT '',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_product_reporter (product_id, reporter_user_id),
+  FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE,
+  FOREIGN KEY (reporter_user_id) REFERENCES users(user_id) ON DELETE CASCADE
+);
+
