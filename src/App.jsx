@@ -19,6 +19,7 @@ import ProfilePage from './Pages/profile';
 import ChangePasswordPage from './Pages/ChangePasswordPage';
 import StartupCheckPage from './Pages/StartupCheck';
 import AdminPage from './Pages/AdminPage';
+import Toast from './component/Toast';
 
 const categoryIds = {
   Textbooks: 1,
@@ -104,8 +105,13 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [toast, setToast] = useState(null);
   const currentPage = pathToPage(location.pathname);
   const setCurrentPage = (page) => navigate(pageToPath(page));
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+    window.setTimeout(() => setToast(null), 4500);
+  };
 
   const mapApiProduct = (p) => ({
     id: Number(p.product_id),
@@ -345,9 +351,9 @@ export default function App() {
       await loadProducts();
       await loadUserProducts();
       setCurrentPage('dashboard');
-      alert('✅ Product posted successfully!');
+      showToast('Product posted successfully.');
     } catch (error) {
-      alert('❌ Failed to post product: ' + error.message);
+      showToast(`Could not post product: ${error.message}`, 'error');
     }
   };
 
@@ -356,9 +362,9 @@ export default function App() {
       await api.deleteProduct(productId);
       setProducts(products.filter((product) => product.id !== productId));
       setUserProducts(userProducts.filter((product) => product.id !== productId));
-      alert('✅ Product deleted!');
+      showToast('Product deleted.');
     } catch (error) {
-      alert('❌ Failed to delete: ' + error.message);
+      showToast(`Could not delete product: ${error.message}`, 'error');
     }
   };
 
@@ -381,9 +387,9 @@ export default function App() {
       await loadProducts();
       await loadUserProducts();
       setCurrentPage('dashboard');
-      alert('✅ Product updated!');
+      showToast('Product updated.');
     } catch (error) {
-      alert('❌ Failed to update: ' + error.message);
+      showToast(`Could not update product: ${error.message}`, 'error');
     }
   };
 
@@ -395,17 +401,17 @@ export default function App() {
 
     const selectedProduct = products.find((item) => item.id === productId);
     if (!selectedProduct) {
-      alert('❌ Item not found.');
+      showToast('Item not found.', 'error');
       return;
     }
 
     if (selectedProduct.ownerId === currentUser.id) {
-      alert('❌ You cannot buy your own listing.');
+      showToast('You cannot buy your own listing.', 'error');
       return;
     }
 
     if (selectedProduct.isSold) {
-      alert('❌ This item is already sold.');
+      showToast('This item is already sold.', 'error');
       return;
     }
 
@@ -425,9 +431,9 @@ export default function App() {
       setWishlist(wishlist.filter((id) => id !== productId));
       setCurrentPage('dashboard');
 
-      alert('✅ Purchase successful! You can view this in My Purchases.');
+      showToast('Purchase successful. You can view it in My Purchases.');
     } catch (error) {
-      alert('❌ Purchase failed: ' + error.message);
+      showToast(`Purchase failed: ${error.message}`, 'error');
     }
   };
 
@@ -446,7 +452,7 @@ export default function App() {
         setWishlist((items) => [...items, productId]);
       }
     } catch (error) {
-      alert(`Could not update saved items: ${error.message}`);
+      showToast(`Could not update saved items: ${error.message}`, 'error');
     }
   };
 
@@ -613,7 +619,7 @@ export default function App() {
           const product = userProducts.find((item) => item.id === productId);
 
           if (!product || product.ownerId !== currentUser.id) {
-            alert('❌ You can only edit your own items.');
+            showToast('You can only edit your own items.', 'error');
             setCurrentPage('dashboard');
             return null;
           }
@@ -645,6 +651,8 @@ export default function App() {
       <main className="app-main">
         {loading ? <div className="loading">Loading...</div> : renderPage()}
       </main>
+
+      <Toast toast={toast} onDismiss={() => setToast(null)} />
 
       {isLoggedIn && <Footer />}
     </div>
