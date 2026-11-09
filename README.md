@@ -14,6 +14,7 @@ within the collage phriphery
 - Product detail view
 - Add product
 - Remove Product
+-
 - Filters (category, price, etc.)
 - Profile page
 - Backend integration
