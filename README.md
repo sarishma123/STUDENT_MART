@@ -14,7 +14,7 @@ within the collage phriphery
 - Product detail view
 - Add product
 - Remove Product
-- Add the whislit
+- Add the whislit feature
 - Filters (category, price, etc.)
 - Profile page
 - Backend integration
