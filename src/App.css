@@ -1,17 +1,17 @@
 :root {
   --font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --app-bg: #f4f7fb;
-  --surface: rgba(255, 255, 255, 0.9);
+  --app-bg: #f7f7f2;
+  --surface: #ffffff;
   --surface-strong: #ffffff;
-  --primary: #2563eb;
-  --primary-soft: rgba(37, 99, 235, 0.12);
-  --secondary: #0f766e;
-  --accent: #f97316;
-  --text: #102033;
-  --muted: #66758a;
-  --border: rgba(16, 32, 51, 0.08);
-  --shadow: 0 14px 36px rgba(15, 23, 42, 0.08);
-  --shadow-lg: 0 24px 60px rgba(15, 23, 42, 0.14);
+  --primary: #285943;
+  --primary-soft: #eaf1eb;
+  --secondary: #1e4432;
+  --accent: #285943;
+  --text: #252b27;
+  --muted: #737b74;
+  --border: #e5e8e2;
+  --shadow: 0 8px 24px rgba(37, 43, 39, 0.06);
+  --shadow-lg: 0 16px 36px rgba(37, 43, 39, 0.1);
   --page-width: 1180px;
 }
 
@@ -52,16 +52,13 @@ button:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
-  outline: 3px solid rgba(37, 99, 235, 0.18);
+  outline: 3px solid rgba(40, 89, 67, 0.2);
   outline-offset: 2px;
 }
 
 .app-shell {
   min-height: 100vh;
-  background:
-    radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), transparent 32%),
-    radial-gradient(circle at top right, rgba(15, 118, 110, 0.07), transparent 28%),
-    var(--app-bg);
+  background: var(--app-bg);
 }
 
 .app-main {
@@ -167,7 +164,7 @@ select:focus-visible {
   overflow: hidden;
   padding: clamp(3rem, 6vw, 5.5rem) 2rem;
   border-radius: 32px;
-  background: linear-gradient(135deg, #0f766e 0%, #2563eb 100%);
+  background: var(--primary);
   color: #fff;
   box-shadow: var(--shadow-lg);
 }
@@ -180,7 +177,7 @@ select:focus-visible {
   width: 18rem;
   height: 18rem;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.11);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .hero-title {
@@ -216,7 +213,7 @@ select:focus-visible {
 }
 
 .section-surface--tinted {
-  background: linear-gradient(180deg, rgba(37, 99, 235, 0.06), rgba(15, 118, 110, 0.04));
+  background: var(--primary-soft);
 }
 
 .btn {
@@ -237,26 +234,26 @@ select:focus-visible {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  background: var(--primary);
   color: #fff;
 }
 
 .btn-secondary {
   background: #fff;
   color: var(--primary);
-  border: 1px solid rgba(37, 99, 235, 0.18);
+  border: 1px solid var(--border);
 }
 
 .btn-ghost {
-  background: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.12);
   color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .btn-danger {
-  background: #fff5f5;
+  background: #fdf2f0;
   color: #c53030;
-  border: 1px solid rgba(197, 48, 48, 0.14);
+  border: 1px solid #f0d7d2;
 }
 
 .toast {
@@ -274,7 +271,7 @@ select:focus-visible {
   box-shadow: var(--shadow-lg);
 }
 
-.toast--success { background: #0f766e; }
+.toast--success { background: var(--primary); }
 .toast--error { background: #b42318; }
 
 .toast__dismiss {
@@ -295,7 +292,7 @@ select:focus-visible {
   display: grid;
   place-items: center;
   padding: 1rem;
-  background: rgba(15, 23, 42, 0.48);
+  background: rgba(37, 43, 39, 0.48);
 }
 
 .confirm-dialog {
@@ -324,7 +321,7 @@ select:focus-visible {
 .field {
   width: 100%;
   padding: 0.95rem 1rem;
-  border: 1px solid #d9e0ea;
+  border: 1px solid var(--border);
   border-radius: 14px;
   background: #fff;
   color: var(--text);
@@ -336,8 +333,8 @@ select:focus-visible {
 }
 
 .field:focus {
-  border-color: rgba(37, 99, 235, 0.55);
-  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+  border-color: rgba(40, 89, 67, 0.55);
+  box-shadow: 0 0 0 4px rgba(40, 89, 67, 0.1);
 }
 
 .field--textarea {
@@ -385,8 +382,8 @@ select:focus-visible {
   justify-content: space-between;
   gap: 1rem;
   padding: 1rem 1.5rem;
-  background: rgba(255, 255, 255, 0.88);
-  border-bottom: 1px solid rgba(16, 32, 51, 0.06);
+  background: rgba(255, 255, 255, 0.96);
+  border-bottom: 1px solid var(--border);
   backdrop-filter: blur(16px);
 }
 
@@ -408,7 +405,7 @@ select:focus-visible {
   display: grid;
   place-items: center;
   border-radius: 16px;
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.14), rgba(15, 118, 110, 0.16));
+  background: var(--primary-soft);
   font-size: 1.25rem;
 }
 
@@ -442,7 +439,7 @@ select:focus-visible {
 }
 
 .site-nav__link:hover {
-  background: rgba(37, 99, 235, 0.08);
+  background: var(--primary-soft);
   color: var(--primary);
 }
 
@@ -450,7 +447,7 @@ select:focus-visible {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: var(--primary);
   color: #fff;
 }
 
@@ -458,8 +455,8 @@ select:focus-visible {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(15, 23, 42, 0.05);
-  color: #334155;
+  background: var(--primary-soft);
+  color: var(--primary);
   width: 2.75rem;
   height: 2.75rem;
   padding: 0;
@@ -477,7 +474,7 @@ select:focus-visible {
   border: 0;
   border-radius: 10px;
   padding: 0.5rem;
-  background: rgba(37, 99, 235, 0.08);
+  background: var(--primary-soft);
   color: var(--primary);
   cursor: pointer;
 }
@@ -489,7 +486,7 @@ select:focus-visible {
   text-align: center;
   color: #fff;
   border-radius: 24px;
-  background: linear-gradient(135deg, #102033 0%, #1e293b 100%);
+  background: var(--secondary);
 }
 
 .site-footer__title {
@@ -501,7 +498,7 @@ select:focus-visible {
 .site-footer__subtext {
   margin: 0.25rem 0 0;
   font-size: 0.85rem;
-  color: #cbd5e1;
+  color: #d5e0d8;
 }
 
 .product-card {
@@ -523,7 +520,7 @@ select:focus-visible {
   min-height: 160px;
   display: grid;
   place-items: center;
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(15, 118, 110, 0.09));
+  background: var(--primary-soft);
   font-size: 2.75rem;
 }
 
@@ -552,7 +549,7 @@ select:focus-visible {
   border: 0;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+  box-shadow: 0 6px 16px rgba(37, 43, 39, 0.1);
   cursor: pointer;
 }
 
@@ -602,7 +599,7 @@ select:focus-visible {
 .product-card__badge {
   padding: 0.35rem 0.7rem;
   border-radius: 999px;
-  background: rgba(37, 99, 235, 0.1);
+  background: var(--primary-soft);
   color: var(--primary);
   font-size: 0.72rem;
   font-weight: 800;
@@ -627,7 +624,7 @@ select:focus-visible {
   gap: 0.7rem;
   padding: 0.85rem 1rem;
   background: #fff;
-  border: 1px solid #d9e0ea;
+  border: 1px solid var(--border);
   border-radius: 16px;
 }
 
@@ -651,7 +648,7 @@ select:focus-visible {
   gap: 0.6rem;
   padding: 0.75rem 0.85rem;
   border-radius: 14px;
-  border: 1px solid rgba(16, 32, 51, 0.08);
+  border: 1px solid var(--border);
   background: #fff;
   color: #334155;
   cursor: pointer;
@@ -666,8 +663,8 @@ select:focus-visible {
   padding: 3rem 1.5rem;
   text-align: center;
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px dashed rgba(16, 32, 51, 0.14);
+  background: var(--surface);
+  border: 1px dashed var(--border);
 }
 
 .product-grid,
@@ -700,8 +697,8 @@ select:focus-visible {
 .detail-seller-card,
 .dashboard-panel__header,
 .browse-panel {
-  background: rgba(255, 255, 255, 0.76);
-  border: 1px solid rgba(16, 32, 51, 0.08);
+  background: var(--surface);
+  border: 1px solid var(--border);
   border-radius: 20px;
 }
 
@@ -716,7 +713,7 @@ select:focus-visible {
 
 .chip-button {
   padding: 1rem 1.1rem;
-  border: 1px solid rgba(16, 32, 51, 0.08);
+  border: 1px solid var(--border);
   border-radius: 18px;
   background: #fff;
   color: var(--primary);
@@ -759,11 +756,11 @@ select:focus-visible {
 }
 
 .dashboard-table thead tr {
-  background: rgba(37, 99, 235, 0.04);
+  background: var(--primary-soft);
 }
 
 .dashboard-table tbody tr + tr {
-  border-top: 1px solid rgba(16, 32, 51, 0.08);
+  border-top: 1px solid var(--border);
 }
 
 .dashboard-table__actions {
@@ -772,7 +769,7 @@ select:focus-visible {
 
 .icon-button {
   border: 0;
-  background: rgba(37, 99, 235, 0.08);
+  background: var(--primary-soft);
   color: var(--primary);
   width: 2.25rem;
   height: 2.25rem;
@@ -818,7 +815,7 @@ select:focus-visible {
   place-items: center;
   min-height: 420px;
   border-radius: 24px;
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(15, 118, 110, 0.12));
+  background: var(--primary-soft);
   font-size: 5rem;
 }
 
@@ -837,7 +834,7 @@ select:focus-visible {
 .detail-price-box {
   padding: 1.25rem 1.4rem;
   border-radius: 18px;
-  background: rgba(37, 99, 235, 0.08);
+  background: var(--primary-soft);
   margin-bottom: 1.25rem;
 }
 
@@ -964,7 +961,7 @@ select:focus-visible {
   padding: 1rem;
   border: 1px solid var(--border);
   border-radius: 14px;
-  background: rgba(244, 247, 251, 0.72);
+  background: var(--app-bg);
 }
 
 .change-password-card {
@@ -1051,7 +1048,7 @@ select:focus-visible {
   display: flex;
   margin-top: 1.25rem;
   margin-bottom: 1.25rem;
-  background: rgba(16, 32, 51, 0.05);
+  background: var(--primary-soft);
   border-radius: 999px;
   padding: 0.3rem;
 }
