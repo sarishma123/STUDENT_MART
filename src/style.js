@@ -1,17 +1,17 @@
 export const inputStyle = {
   width: '100%',
-  padding: '0.75rem',
-  border: '1px solid #e2e8f0',
-  borderRadius: '8px',
+  padding: 'var(--space-3)',
+  border: '1px solid var(--color-border)',
+  borderRadius: 'var(--radius-md)',
   fontSize: '0.95rem',
-  fontFamily: 'inherit',
+  fontFamily: 'var(--font-sans)',
   boxSizing: 'border-box',
 };
 
 export const navButtonStyle = {
   background: 'none',
   border: 'none',
-  color: 'white',
+  color: 'var(--color-surface)',
   cursor: 'pointer',
   fontWeight: '500',
   fontSize: '0.95rem',
