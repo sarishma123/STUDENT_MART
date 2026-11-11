@@ -1,4 +1,4 @@
-import { LogIn, LogOut, Menu, Plus, X } from 'lucide-react';
+import { GraduationCap, LogIn, LogOut, Menu, Plus, X } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Header({
@@ -18,7 +18,9 @@ export default function Header({
   return (
     <header className="site-header">
       <button className="site-brand" type="button" onClick={() => setCurrentPage('home')}>
-        <span className="site-brand__mark">🎓</span>
+        <span className="site-brand__mark" aria-hidden="true">
+          <GraduationCap size={21} strokeWidth={1.8} />
+        </span>
         <span className="site-brand__name">On-Campus Mart</span>
       </button>
 

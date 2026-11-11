@@ -1,3 +1,5 @@
+import { Heart } from 'lucide-react';
+
 export default function ProductCard({
   product,
   isWishlisted,
@@ -23,7 +25,7 @@ export default function ProductCard({
           className="product-card__wishlist"
           aria-label={isWishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
         >
-          {isWishlisted ? '❤️' : '🤍'}
+          <Heart size={18} strokeWidth={1.8} fill={isWishlisted ? 'currentColor' : 'none'} />
         </button>
       </div>
 
