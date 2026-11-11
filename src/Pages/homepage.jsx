@@ -1,26 +1,4 @@
 import ProductCard from '../component/productcard';
-import {
-  BookOpen,
-  Calculator,
-  FlaskConical,
-  GraduationCap,
-  Laptop,
-  PiggyBank,
-  PenLine,
-  Recycle,
-  Search,
-  ShieldCheck,
-  Users,
-} from 'lucide-react';
-
-const categories = [
-  { label: 'Notes', icon: BookOpen },
-  { label: 'Textbooks', icon: BookOpen },
-  { label: 'Calculators', icon: Calculator },
-  { label: 'Lab Equipment', icon: FlaskConical },
-  { label: 'Stationery', icon: PenLine },
-  { label: 'Electronics', icon: Laptop },
-];
 
 export default function HomePage({
   products,
@@ -28,18 +6,12 @@ export default function HomePage({
   onToggleWishlist,
   onViewDetails,
   onLoginClick,
-  searchQuery,
-  onSearchChange,
-  onSearchSubmit,
 }) {
   return (
     <div className="page page--wide">
       <section className="hero-section">
-        <div className="hero-mark" aria-hidden="true">
-          <GraduationCap size={24} strokeWidth={1.8} />
-        </div>
         <h1 className="hero-title">
-          On-Campus Mart
+          🎓 On-Campus Mart
         </h1>
         <h2 className="hero-subtitle">
           Give Your Old Notes a Second Life
@@ -47,18 +19,6 @@ export default function HomePage({
         <p className="hero-copy">
           Find affordable study materials from seniors. Sell your old books, notes, and equipment to help fellow students. Save money. Reduce waste. Support your campus community.
         </p>
-
-        <form className="hero-search" onSubmit={onSearchSubmit}>
-          <Search size={19} strokeWidth={1.8} aria-hidden="true" />
-          <input
-            type="search"
-            value={searchQuery}
-            onChange={(event) => onSearchChange(event.target.value)}
-            placeholder="Search notes, textbooks, or equipment"
-            aria-label="Search marketplace"
-          />
-          <button type="submit" className="hero-search__submit">Search</button>
-        </form>
 
         <div className="hero-actions">
           <button onClick={onLoginClick} className="btn btn-secondary">
@@ -71,13 +31,7 @@ export default function HomePage({
       </section>
 
       <section className="section-surface">
-        <div className="section-heading-row">
-          <div>
-            <p className="eyebrow">Campus marketplace</p>
-            <h2 className="section-title">Recently listed</h2>
-          </div>
-          <span className="section-note">Fresh finds from fellow students</span>
-        </div>
+        <h2 className="section-title"> Recently Posted</h2>
         <div className="product-grid">
           {products.slice(0, 6).map((product) => (
             <ProductCard
@@ -93,21 +47,19 @@ export default function HomePage({
 
       <section className="section-surface section-surface--tinted">
         <div>
-          <p className="eyebrow eyebrow--center">Why students use it</p>
-          <h2 className="section-title section-title--center">Useful things, passed forward</h2>
+          <h2 className="section-title section-title--center">✨ Why On-Campus Mart?</h2>
           <div className="feature-grid">
             {[
-              { title: 'Save money', desc: 'Find textbooks and notes at student-friendly prices', icon: PiggyBank },
-              { title: 'Help juniors', desc: 'Pass useful materials to the next semester', icon: Users },
-              { title: 'Use less', desc: 'Keep good study materials in circulation', icon: Recycle },
-              { title: 'Trade locally', desc: 'Connect with students in your college', icon: ShieldCheck },
-            ].map(({ title, desc, icon: Icon }) => (
-              <div key={title} className="feature-card">
-                <Icon className="feature-card__icon" size={20} strokeWidth={1.8} />
+              { title: ' Save Money', desc: 'Buy textbooks and notes at 50-70% off retail prices' },
+              { title: ' Help Juniors', desc: 'Sell your old materials to next semester students' },
+              { title: ' Be Green', desc: 'Reduce paper waste and support sustainability' },
+              { title: ' Easy & Safe', desc: 'Connect directly with students in your college' },
+            ].map((item) => (
+              <div key={item.title} className="feature-card">
                 <h3 className="feature-title">
-                  {title}
+                  {item.title}
                 </h3>
-                <p className="muted feature-copy">{desc}</p>
+                <p className="muted feature-copy">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -115,15 +67,13 @@ export default function HomePage({
       </section>
 
       <section className="section-surface">
-        <p className="eyebrow">Browse by need</p>
-        <h2 className="section-title">Popular categories</h2>
+        <h2 className="section-title"> Popular Categories</h2>
         <div className="category-grid">
-          {categories.map(({ label, icon: Icon }) => (
-            <button key={label} className="chip-button">
-              <Icon size={18} strokeWidth={1.8} />
-              {label}
-            </button>
-          ))}
+          {['Notes', 'Textbooks', ' Calculators', ' Lab Equipment', ' Stationery', ' Electronics'].map(
+            (cat) => (
+              <button key={cat} className="chip-button">{cat}</button>
+            )
+          )}
         </div>
       </section>
     </div>
