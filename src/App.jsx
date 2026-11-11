@@ -482,6 +482,12 @@ export default function App() {
       onToggleWishlist={toggleWishlist}
       onViewDetails={(id) => setCurrentPage(`product-${id}`)}
       onLoginClick={() => openAuth('login', 'home')}
+      searchQuery={searchQuery}
+      onSearchChange={setSearchQuery}
+      onSearchSubmit={(event) => {
+        event.preventDefault();
+        setCurrentPage('browse');
+      }}
     />
   );
 

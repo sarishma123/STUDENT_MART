@@ -8,6 +8,7 @@ import {
   PiggyBank,
   PenLine,
   Recycle,
+  Search,
   ShieldCheck,
   Users,
 } from 'lucide-react';
@@ -27,6 +28,9 @@ export default function HomePage({
   onToggleWishlist,
   onViewDetails,
   onLoginClick,
+  searchQuery,
+  onSearchChange,
+  onSearchSubmit,
 }) {
   return (
     <div className="page page--wide">
@@ -43,6 +47,18 @@ export default function HomePage({
         <p className="hero-copy">
           Find affordable study materials from seniors. Sell your old books, notes, and equipment to help fellow students. Save money. Reduce waste. Support your campus community.
         </p>
+
+        <form className="hero-search" onSubmit={onSearchSubmit}>
+          <Search size={19} strokeWidth={1.8} aria-hidden="true" />
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={(event) => onSearchChange(event.target.value)}
+            placeholder="Search notes, textbooks, or equipment"
+            aria-label="Search marketplace"
+          />
+          <button type="submit" className="hero-search__submit">Search</button>
+        </form>
 
         <div className="hero-actions">
           <button onClick={onLoginClick} className="btn btn-secondary">
