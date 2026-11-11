@@ -435,7 +435,7 @@ select:focus-visible {
 
 .site-nav__link {
   background: transparent;
-  color: #334155;
+  color: var(--text);
 }
 
 .site-nav__link:hover {
@@ -574,7 +574,7 @@ select:focus-visible {
   font-size: 0.95rem;
   font-weight: 800;
   line-height: 1.35;
-  color: #1f2937;
+  color: var(--text);
 }
 
 .product-card__meta {
@@ -650,7 +650,7 @@ select:focus-visible {
   border-radius: 14px;
   border: 1px solid var(--border);
   background: #fff;
-  color: #334155;
+  color: var(--text);
   cursor: pointer;
 }
 
@@ -741,7 +741,7 @@ select:focus-visible {
   border-left: 0;
   border-right: 0;
   border-top: 0;
-  border-bottom: 1px solid rgba(16, 32, 51, 0.08);
+  border-bottom: 1px solid var(--border);
 }
 
 .dashboard-table {
@@ -795,8 +795,8 @@ select:focus-visible {
 }
 
 .status-pill--active {
-  color: #0f766e;
-  background: rgba(15, 118, 110, 0.12);
+  color: var(--primary);
+  background: var(--primary-soft);
 }
 
 .status-pill--sold {
@@ -909,7 +909,7 @@ select:focus-visible {
   place-items: center;
   margin: 0 auto 1rem;
   border-radius: 18px;
-  background: rgba(37, 99, 235, 0.08);
+  background: var(--primary-soft);
   font-size: 2rem;
 }
 
@@ -939,7 +939,7 @@ select:focus-visible {
   padding: 0.85rem 1rem;
   margin-bottom: 0.7rem;
   border-radius: 14px;
-  color: #334155;
+  color: var(--text);
   cursor: pointer;
   background: rgba(255, 255, 255, 0.92);
 }
@@ -988,7 +988,7 @@ select:focus-visible {
   margin: 0 0 0.5rem;
   font-size: 1.1rem;
   font-weight: 800;
-  color: #1f2937;
+  color: var(--text);
 }
 
 .feature-copy {
@@ -1012,7 +1012,7 @@ select:focus-visible {
   margin: 0 0 0.85rem;
   font-weight: 700;
   font-size: 0.95rem;
-  color: #1f2937;
+  color: var(--text);
 }
 
 .auth-page {
@@ -1124,8 +1124,8 @@ select:focus-visible {
   margin: 0;
   padding: 0.65rem 0.85rem;
   border-radius: 10px;
-  background: rgba(15, 118, 110, 0.1);
-  color: #0f766e;
+  background: var(--primary-soft);
+  color: var(--primary);
   font-size: 0.85rem;
   font-weight: 600;
 }
