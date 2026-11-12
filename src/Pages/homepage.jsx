@@ -10,9 +10,9 @@ export default function HomePage({
   return (
     <div className="page page--wide">
       <section className="hero-section">
-        <h1 className="hero-title">On-Campus Mart</h1>
+        <h1 className="hero-title">Find what you need. Sell what you don't.</h1>
         <p className="hero-copy">
-          Buy and sell used books, notes, and equipment with fellow students.
+          Buy and sell used books, notes and everyday essentials with fellow students.
         </p>
 
         <div className="hero-actions">
