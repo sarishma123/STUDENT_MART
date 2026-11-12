@@ -387,9 +387,8 @@ select:focus-visible {
   justify-content: space-between;
   gap: 1rem;
   padding: 1rem 1.5rem;
-  background: rgba(255, 255, 255, 0.88);
-  border-bottom: 1px solid rgba(16, 32, 51, 0.06);
-  backdrop-filter: blur(16px);
+  background: #ffffff;
+  border-bottom: 1px solid var(--border);
 }
 
 .site-brand {
@@ -409,8 +408,8 @@ select:focus-visible {
   height: 2.5rem;
   display: grid;
   place-items: center;
-  border-radius: 16px;
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.14), rgba(15, 118, 110, 0.16));
+  border-radius: 12px;
+  background: var(--primary-soft);
   font-size: 1.25rem;
 }
 
@@ -440,7 +439,7 @@ select:focus-visible {
 
 .site-nav__link {
   background: transparent;
-  color: #334155;
+  color: var(--text);
 }
 
 .site-nav__link:hover {
@@ -452,19 +451,21 @@ select:focus-visible {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: var(--primary);
   color: #fff;
+  border: 2px solid var(--primary);
 }
 
 .site-nav__icon-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(15, 23, 42, 0.05);
-  color: #334155;
+  background: transparent;
+  color: var(--text);
   width: 2.75rem;
   height: 2.75rem;
   padding: 0;
+  border: 1px solid var(--border);
 }
 
 .site-header__actions {
