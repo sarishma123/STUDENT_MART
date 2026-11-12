@@ -18,8 +18,7 @@ export default function Header({
   return (
     <header className="site-header">
       <button className="site-brand" type="button" onClick={() => setCurrentPage('home')}>
-        <span className="site-brand__mark">🎓</span>
-        <span className="site-brand__name">On-Campus Mart</span>
+        <span className="site-brand__name">Student Mart</span>
       </button>
 
       <button type="button" className="site-menu-toggle" onClick={() => setMenuOpen((open) => !open)} aria-expanded={menuOpen} aria-label="Toggle menu">
