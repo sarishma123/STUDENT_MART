@@ -1210,6 +1210,13 @@ select:focus-visible {
     flex-wrap: wrap;
   }
 
+  .site-search {
+    order: 3;
+    max-width: none;
+    width: 100%;
+    flex-basis: 100%;
+  }
+
   .site-menu-toggle {
     display: inline-grid;
     place-items: center;
