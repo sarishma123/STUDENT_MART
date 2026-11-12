@@ -181,23 +181,18 @@ select:focus-visible {
 }
 
 .hero-title {
-  margin: 0 0 0.75rem;
-  font-size: clamp(2.2rem, 4vw, 4rem);
-  line-height: 1.05;
-}
-
-.hero-subtitle {
-  margin: 0 0 0.85rem;
-  font-size: clamp(1rem, 1.7vw, 1.25rem);
-  font-weight: 600;
-  opacity: 0.96;
+  margin: 0 0 1rem;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.1;
+  font-weight: 800;
 }
 
 .hero-copy {
-  max-width: 760px;
+  max-width: 600px;
   margin: 0 auto 2rem;
-  line-height: 1.75;
-  opacity: 0.92;
+  line-height: 1.6;
+  font-size: 1.1rem;
+  opacity: 0.95;
 }
 
 .hero-actions {
@@ -213,7 +208,8 @@ select:focus-visible {
 }
 
 .section-surface--tinted {
-  background: linear-gradient(180deg, rgba(37, 99, 235, 0.06), rgba(15, 118, 110, 0.04));
+  background: rgba(27, 67, 50, 0.02);
+  border: 1px solid var(--border);
 }
 
 .btn {
@@ -526,7 +522,7 @@ select:focus-visible {
   min-height: 160px;
   display: grid;
   place-items: center;
-  background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(15, 118, 110, 0.09));
+  background: rgba(27, 67, 50, 0.05);
   font-size: 2.75rem;
 }
 
@@ -605,7 +601,7 @@ select:focus-visible {
 .product-card__badge {
   padding: 0.35rem 0.7rem;
   border-radius: 999px;
-  background: rgba(37, 99, 235, 0.1);
+  background: var(--primary-soft);
   color: var(--primary);
   font-size: 0.72rem;
   font-weight: 800;
