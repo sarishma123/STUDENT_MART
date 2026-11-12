@@ -461,6 +461,37 @@ select:focus-visible {
   gap: 0.7rem;
 }
 
+.site-search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  max-width: 360px;
+  padding: 0.55rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--app-bg);
+  color: var(--muted);
+}
+
+.site-search__icon {
+  flex-shrink: 0;
+  color: var(--muted);
+}
+
+.site-search__input {
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.site-search__input::placeholder {
+  color: var(--muted);
+}
+
 .site-menu-toggle {
   display: none;
   margin-left: auto;
