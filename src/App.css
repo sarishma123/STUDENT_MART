@@ -410,7 +410,7 @@ select:focus-visible {
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   justify-content: center;
 }
 
@@ -430,7 +430,7 @@ select:focus-visible {
 }
 
 .site-nav__link:hover {
-  background: rgba(37, 99, 235, 0.08);
+  background: var(--primary-soft);
   color: var(--primary);
 }
 
@@ -467,7 +467,7 @@ select:focus-visible {
   border: 0;
   border-radius: 10px;
   padding: 0.5rem;
-  background: rgba(37, 99, 235, 0.08);
+  background: var(--primary-soft);
   color: var(--primary);
   cursor: pointer;
 }
