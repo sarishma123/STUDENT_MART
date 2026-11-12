@@ -1,4 +1,4 @@
-import { LogIn, LogOut, Menu, Plus, X } from 'lucide-react';
+import { LogIn, LogOut, Menu, Plus, Search, X } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Header({
@@ -8,6 +8,8 @@ export default function Header({
   onLoginClick,
   onBuySellClick,
   isLoggedIn,
+  searchQuery,
+  onSearchChange,
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const goTo = (page) => {
@@ -15,11 +17,28 @@ export default function Header({
     setMenuOpen(false);
   };
 
+  const handleSearch = (e) => {
+    onSearchChange(e.target.value);
+    if (e.target.value) setCurrentPage('browse');
+  };
+
   return (
     <header className="site-header">
       <button className="site-brand" type="button" onClick={() => setCurrentPage('home')}>
         <span className="site-brand__name">Student Mart</span>
       </button>
+
+      <div className="site-search">
+        <Search size={18} className="site-search__icon" />
+        <input
+          type="text"
+          placeholder="Search items..."
+          value={searchQuery || ''}
+          onChange={handleSearch}
+          className="site-search__input"
+          aria-label="Search items"
+        />
+      </div>
 
       <button type="button" className="site-menu-toggle" onClick={() => setMenuOpen((open) => !open)} aria-expanded={menuOpen} aria-label="Toggle menu">
         {menuOpen ? <X size={20} /> : <Menu size={20} />}

@@ -646,6 +646,8 @@ export default function App() {
         onLoginClick={() => openAuth('login', 'home')}
         onBuySellClick={() => setCurrentPage('browse')}
         isLoggedIn={isLoggedIn}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
       />
 
       <main className="app-main">
