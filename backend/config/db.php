@@ -1,4 +1,11 @@
 <?php
+// Defense-in-depth: if this file is ever requested directly over HTTP (instead of
+// being included by the app), refuse to run so credentials are never served.
+if (isset($_SERVER['REQUEST_METHOD']) && basename($_SERVER['SCRIPT_FILENAME'] ?? '') === basename(__FILE__)) {
+    http_response_code(403);
+    exit('Forbidden');
+}
+
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 $configPath = getenv('STUDENT_MART_CONFIG')
