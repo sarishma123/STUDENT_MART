@@ -28,7 +28,13 @@ function requireRole(string ...$roles): void
         jsonError('Authentication required', 401);
     }
 
-    if (!in_array($_SESSION['role'] ?? 'user', $roles, true)) {
+    global $conn;
+    $stmt = $conn->prepare('SELECT role FROM users WHERE user_id = ?');
+    $stmt->bind_param('i', $_SESSION['user_id']);
+    $stmt->execute();
+    $user = $stmt->get_result()->fetch_assoc();
+
+    if (!$user || !in_array($user['role'], $roles, true)) {
         jsonError('Forbidden', 403);
     }
 }

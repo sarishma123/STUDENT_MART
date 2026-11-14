@@ -206,7 +206,7 @@ if ($action === 'POST') {
         }
 
         $newPasswordHash = password_hash($newPassword, PASSWORD_DEFAULT);
-        $update = $conn->prepare("UPDATE users SET password = ? WHERE user_id = ?");
+        $update = $conn->prepare("UPDATE users SET password = ?, session_version = session_version + 1 WHERE user_id = ?");
         $update->bind_param("si", $newPasswordHash, $_SESSION['user_id']);
         $update->execute();
 
