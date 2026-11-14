@@ -209,6 +209,8 @@ if ($action === 'POST') {
         $update = $conn->prepare("UPDATE users SET password = ?, session_version = session_version + 1 WHERE user_id = ?");
         $update->bind_param("si", $newPasswordHash, $_SESSION['user_id']);
         $update->execute();
+        $_SESSION['session_version'] = (int)($_SESSION['session_version'] ?? 1) + 1;
+        session_regenerate_id(true);
 
         jsonResponse(['success' => true, 'message' => 'Password changed successfully.']);
 
