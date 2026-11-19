@@ -68,6 +68,11 @@ function pageToPath(page) {
   if (page === 'change-password') return '/profile/password';
   if (page === 'startup-check') return '/system-check';
   if (page === 'admin') return '/admin';
+  if (page === 'privacy') return '/privacy';
+  if (page === 'terms') return '/terms';
+  if (page === 'refund') return '/refund';
+  if (page === 'cookies') return '/cookies';
+  if (page === 'data-deletion') return '/data-deletion';
   if (page.startsWith('product-')) return `/products/${page.slice('product-'.length)}`;
   if (page.startsWith('edit-')) return `/products/${page.slice('edit-'.length)}/edit`;
   return '/';
@@ -84,6 +89,11 @@ function pathToPage(pathname) {
   if (pathname === '/profile/password') return 'change-password';
   if (pathname === '/system-check') return 'startup-check';
   if (pathname === '/admin') return 'admin';
+  if (pathname === '/privacy') return 'privacy';
+  if (pathname === '/terms') return 'terms';
+  if (pathname === '/refund') return 'refund';
+  if (pathname === '/cookies') return 'cookies';
+  if (pathname === '/data-deletion') return 'data-deletion';
 
   const editMatch = pathname.match(/^\/products\/(\d+)\/edit$/);
   if (editMatch) return `edit-${editMatch[1]}`;
