@@ -515,6 +515,29 @@ select:focus-visible {
   color: #cbd5e1;
 }
 
+.site-footer__links {
+  margin-top: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: center;
+}
+
+.site-footer__link {
+  background: transparent;
+  border: 0;
+  color: #cbd5e1;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+}
+
+.site-footer__link:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
 .product-card {
   overflow: hidden;
   cursor: pointer;
