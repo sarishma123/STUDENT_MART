@@ -602,6 +602,21 @@ export default function App() {
       case 'startup-check':
         return <StartupCheckPage />;
 
+      case 'privacy':
+        return <PrivacyPage setCurrentPage={setCurrentPage} />;
+
+      case 'terms':
+        return <TermsPage setCurrentPage={setCurrentPage} />;
+
+      case 'refund':
+        return <RefundPage setCurrentPage={setCurrentPage} />;
+
+      case 'cookies':
+        return <CookiePolicyPage setCurrentPage={setCurrentPage} />;
+
+      case 'data-deletion':
+        return <DataDeletionPage />;
+
       default:
         if (currentPage.startsWith('product-')) {
           const productId = parseFloat(currentPage.split('-')[1]);
