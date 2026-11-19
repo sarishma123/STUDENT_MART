@@ -15,6 +15,7 @@ export default function AuthPage({
   onRegister,
   onForgotPassword,
   onResetPassword,
+  setCurrentPage,
   initialMode = 'login',
 }) {
   const [mode, setMode] = useState(initialMode);
@@ -35,6 +36,9 @@ export default function AuthPage({
   const [resetPassword, setResetPassword] = useState('');
   const [resetConfirm, setResetConfirm] = useState('');
   const [resetError, setResetError] = useState('');
+  const [consentTerms, setConsentTerms] = useState(false);
+  const [consentPrivacy, setConsentPrivacy] = useState(false);
+  const [consentAge, setConsentAge] = useState(false);
 
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
@@ -92,6 +96,16 @@ export default function AuthPage({
 
     if (password !== confirm) {
       setRegError('Passwords do not match.');
+      return;
+    }
+
+    if (!consentAge) {
+      setRegError('You must confirm that you are at least 13 years old.');
+      return;
+    }
+
+    if (!consentTerms || !consentPrivacy) {
+      setRegError('You must agree to the Terms of Service and Privacy Policy.');
       return;
     }
 
