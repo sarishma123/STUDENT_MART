@@ -19,6 +19,11 @@ import ProfilePage from './Pages/profile';
 import ChangePasswordPage from './Pages/ChangePasswordPage';
 import StartupCheckPage from './Pages/StartupCheck';
 import AdminPage from './Pages/AdminPage';
+import PrivacyPage from './Pages/PrivacyPage';
+import TermsPage from './Pages/TermsPage';
+import RefundPage from './Pages/RefundPage';
+import CookiePolicyPage from './Pages/CookiePolicyPage';
+import DataDeletionPage from './Pages/DataDeletionPage';
 import Toast from './component/Toast';
 
 const categoryIds = {
