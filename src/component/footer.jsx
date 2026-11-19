@@ -7,6 +7,23 @@ export default function Footer() {
       <p className="site-footer__subtext">
         Built for students, by students | Give your old notes a second life!
       </p>
+      <nav className="site-footer__links" aria-label="Legal">
+        <button type="button" className="site-footer__link" onClick={() => window.__studentMartSetPage && window.__studentMartSetPage('privacy')}>
+          Privacy
+        </button>
+        <button type="button" className="site-footer__link" onClick={() => window.__studentMartSetPage && window.__studentMartSetPage('terms')}>
+          Terms
+        </button>
+        <button type="button" className="site-footer__link" onClick={() => window.__studentMartSetPage && window.__studentMartSetPage('refund')}>
+          Refunds
+        </button>
+        <button type="button" className="site-footer__link" onClick={() => window.__studentMartSetPage && window.__studentMartSetPage('cookies')}>
+          Cookies
+        </button>
+        <button type="button" className="site-footer__link" onClick={() => window.__studentMartSetPage && window.__studentMartSetPage('data-deletion')}>
+          Delete account
+        </button>
+      </nav>
     </footer>
   );
 }
