@@ -4,6 +4,7 @@ import './App.css';
 
 import Header from './component/header';
 import Footer from './component/footer';
+import CookieConsent from './component/CookieConsent';
 
 import { categories } from './Data/product';
 import { api } from './api';
@@ -685,6 +686,7 @@ export default function App() {
       </main>
 
       <Toast toast={toast} onDismiss={() => setToast(null)} />
+      <CookieConsent setCurrentPage={setCurrentPage} />
 
       {isLoggedIn && <Footer />}
     </div>
