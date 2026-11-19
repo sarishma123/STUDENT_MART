@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 const KEY = 'student_mart_cookie_consent';
 
-export default function CookieConsent() {
+export default function CookieConsent({ setCurrentPage }) {
   const [shown, setShown] = useState(false);
 
   useEffect(() => {
@@ -26,7 +26,7 @@ export default function CookieConsent() {
           accept our use of cookies.
         </p>
         <div className="cookie-banner__actions">
-          <button type="button" className="btn btn-secondary" onClick={accept}>
+          <button type="button" className="btn btn-secondary" onClick={() => setCurrentPage('cookies')}>
             Learn more
           </button>
           <button type="button" className="btn btn-primary" onClick={accept}>
